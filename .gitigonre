@@ -1,0 +1,16 @@
+# Ignore virtual environment
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Database files (if not needed)
+*.db
+
+# Ignore environment variables (if using a .env file)
+.env
