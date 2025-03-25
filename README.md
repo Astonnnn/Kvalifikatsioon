@@ -15,3 +15,11 @@ env\Scripts\activate
 Once the virtual environment is activated, install the required packages using requirements.txt:
 
 pip install -r requirements.txt
+
+
+ÜLES LAADIMINE
+
+1. git status (kontrollime, millised failid muutusid)
+2. git add. (lisame kõik muutused valikusse)
+3. git commit -m "Kirjeldus" (Commitime koos kommetaariga)
+4. git push origin main
