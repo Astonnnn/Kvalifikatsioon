@@ -3,7 +3,7 @@
 
 1. Loo endale kaust
 2. Ava cmd ning kirjuta: cd sinuKaust
-3. kirjuta: git clone https://https://github.com/Astonnnn/Kvalifikatsioon
+3. kirjuta: git clone https://github.com/Astonnnn/Kvalifikatsioon
 
 4. Loo ja Aktiveeri virtuaalne keskkond 
    4.1 python -m venv env
@@ -16,6 +16,10 @@
     
     Asi on õnnestunud, kui sinu kausta, kui sa vaatad kas file explorerist
     või mujalt kaustas env, selle alamkaustas Scripts mitmed erinevad .exe failid
+
+4. Ühenda enda kaust gihubiga, kui pole juba
+    git remote remove origin
+    git remote add origin "https://github.com/Astonnnn/Kvalifikatsioon"
     
 
 
