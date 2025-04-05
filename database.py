@@ -36,3 +36,4 @@ def kuva_veebilehed():
 
     connection.close()
     print(andmed)
+    return andmed
