@@ -1,9 +1,10 @@
 #pyQt
 
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QDialog, QTabWidget, QFormLayout, QGridLayout
-from PyQt5.QtGui import QIcon, QFont
+import re
+from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
+    QPushButton, QTabWidget, QFormLayout, QGridLayout
+from PyQt5.QtGui import QIcon, QFont, QIntValidator
 from PyQt6.QtWidgets import QStackedWidget
 
 from database import *
@@ -17,12 +18,13 @@ class MainWindow(QMainWindow):
         #self.setWindowIcon(QIcon("")) #logo
         self.tab_widget = QTabWidget()
         self.setCentralWidget(self.tab_widget)
+        loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
 
         self.esileht()
         self.veebilehed()
+        self.seaded()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
 
-        loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
         self.create_menu_bar()
 
     def esileht(self):
@@ -37,6 +39,7 @@ class MainWindow(QMainWindow):
 
         self.ajalimiidi_nimi = QLabel("Sisesta ajalimiit (min):", self)
         self.ajalimiidi_sisend = QLineEdit(self)
+        self.ajalimiidi_sisend.setValidator(QIntValidator())
         sisestusväljaLayout.addRow(self.ajalimiidi_nimi, self.ajalimiidi_sisend)
 
         mainLayout.addLayout(sisestusväljaLayout)
@@ -77,6 +80,18 @@ class MainWindow(QMainWindow):
         self.tab_veebilehed.setLayout(layout)
         self.tab_widget.addTab(self.tab_veebilehed, "Veebilehed")
 
+    def seaded(self):
+        self.tab_seaded = QWidget()
+        layout = QFormLayout()
+
+        self.vanus = QLineEdit(self)
+        self.vanus.setValidator(QIntValidator())
+        layout.addRow("Vanus (aastates): ", self.vanus)
+
+
+        self.tab_seaded.setLayout(layout)
+        self.tab_widget.addTab(self.tab_seaded, "Seaded")
+
 
     def create_menu_bar(self):
         #LOOME MENÜÜ
@@ -113,15 +128,19 @@ class MainWindow(QMainWindow):
         veebileht = self.veebisaidi_sisend.text().strip()
         ajalimiit = self.ajalimiidi_sisend.text().strip()
 
-        #Kontroll et saadakse andmed kätte
-        print(f"Veebileht: {veebileht}, Ajalimiit: {ajalimiit}")
-        #TULEKS LISADA TINGIMUS MIS KONTROLLIB NENDE KEHTIVUST
+
+        if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$', veebileht):
+            #Kontroll et saadakse andmed kätte
+            print(f"Veebileht: {veebileht}, Ajalimiit: {ajalimiit}")
+            #TULEKS LISADA TINGIMUS MIS KONTROLLIB, KAS VEEBILEHT ON JUBA LISATUD NING VASTAVALT SIIS MUUTA AEG, MITTE LISADA
 
 
-        lisa_veebileht(veebileht, int(ajalimiit))
-        print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
-        self.veebisaidi_sisend.clear()
-        self.ajalimiidi_sisend.clear()
+            lisa_veebileht(veebileht, int(ajalimiit))
+            print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
+            self.veebisaidi_sisend.clear()
+            self.ajalimiidi_sisend.clear()
+        else:
+            QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
 
 
