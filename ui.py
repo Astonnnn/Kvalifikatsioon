@@ -2,10 +2,16 @@
 
 import sys
 import re
+
+from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QTabWidget, QFormLayout, QGridLayout
-from PyQt5.QtGui import QIcon, QFont, QIntValidator
+    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog
+from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
 from PyQt6.QtWidgets import QStackedWidget
+
+
+import question_manager
+from question_manager import generate_mcq
 
 from database import *
 
@@ -23,6 +29,7 @@ class MainWindow(QMainWindow):
         self.esileht()
         self.veebilehed()
         self.seaded()
+        self.küsimused()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
 
         self.create_menu_bar()
@@ -93,6 +100,19 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.tab_seaded, "Seaded")
 
 
+    def küsimused(self):
+        self.tab_küsimused = QWidget()
+        layout = QVBoxLayout()
+
+        self.genereeri = QPushButton("Genereeri", self)
+        self.genereeri.clicked.connect(self.genereeri_kysimus)
+
+        layout.addWidget(self.genereeri)
+        self.tab_küsimused.setLayout(layout)
+        self.tab_widget.addTab(self.tab_küsimused, "Küsimused")
+
+
+
     def create_menu_bar(self):
         #LOOME MENÜÜ
         menu_bar = self.menuBar() #loob menüübari, sinna saab lisada veel dropdowne
@@ -141,6 +161,38 @@ class MainWindow(QMainWindow):
             self.ajalimiidi_sisend.clear()
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
+
+    def genereeri_kysimus(self):
+        vastus = generate_mcq("science").split(";")
+        küsimus = vastus[0]
+        valik1 = vastus[1]
+        valik2 = vastus[2]
+        valik3 = vastus[3]
+        valik4 = vastus[4]
+        oigeVastus = vastus[5]
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Küsimus")
+        dialog.setGeometry(100,100,300,150)
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel(küsimus))
+        layout.addWidget(QLabel(valik1))
+        layout.addWidget(QLabel(valik2))
+        layout.addWidget(QLabel(valik3))
+        layout.addWidget(QLabel(valik4))
+
+        regex = QRegExp("[A-Z]{1}")
+        validator = QRegExpValidator(regex)
+        vastamisväli = QLineEdit()
+        vastamisväli.setValidator(validator)
+
+        layout.addWidget(vastamisväli)
+        layout.addWidget(QLabel(oigeVastus))
+
+
+        dialog.setLayout(layout)
+        dialog.exec_()
 
 
 
