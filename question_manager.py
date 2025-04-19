@@ -6,8 +6,7 @@ Requirements:
 -the output has to be on one line, with semicolons as separators
 -output follows this format: Q: Question; A) Answer1; B) Answer2; C) Answer3; D) Answer4; Answer:
 """
-
-   if platform.system() == 'Windows':
+    if platform.system() == 'Windows':
         ollama_path = r'C:\Users\aston\AppData\Local\Programs\Ollama\ollama.exe'
     else:
         ollama_path = 'ollama'
