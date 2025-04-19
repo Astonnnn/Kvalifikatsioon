@@ -7,7 +7,7 @@ from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
     QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
-from PyQt6.QtWidgets import QStackedWidget
+
 
 
 import question_manager
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
-     def genereeri_kysimus(self):
+    def genereeri_kysimus(self):
         vastus = generate_mcq("science").split(";")
         print(vastus)
         küsimus = vastus[0]
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
         valik2 = vastus[2]
         valik3 = vastus[3]
         valik4 = vastus[4]
-        oigeVastus = vastus[5]
+        self.oigeVastus = vastus[5].strip(' \n\n')[-1]
 
         dialog = QDialog(self)
         dialog.setWindowTitle("Küsimus")
@@ -198,24 +198,22 @@ class MainWindow(QMainWindow):
         vasta = QPushButton('Vasta')
         layout.addWidget(vasta)
 
-        oigeVastus2 = oigeVastus.strip('/n')
 
         def kontrolli_vastust():
             valitud_id = button_group.checkedId()
-
+            print(valitud_id)
             valitud_nupp = button_group.button(valitud_id)
 
+            valikud = ['A','B','C','D']
+            oigeVastus2 = valikud.index(self.oigeVastus)
 
-            koik = list(oigeVastus2)
-            numbrid = [int(num) for s in koik for num in re.findall(r'\d+', s)] #See AI annab iga kord erimoodi õige vastuse, see ei tööta kui õiges vastuses on nr.
-            oigeVastus = numbrid[0]
 
             if valitud_nupp:
                 #valitud_tekst = valitud_nupp.text()
-                if valitud_id == oigeVastus:
+                if valitud_id == (oigeVastus2+1):
                     QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
                 else:
-                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {oigeVastus}')
+                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {self.oigeVastus}')
                 dialog.accept()
             else:
                 QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')
