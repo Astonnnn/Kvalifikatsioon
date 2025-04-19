@@ -5,7 +5,7 @@ import re
 
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog
+    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
 from PyQt6.QtWidgets import QStackedWidget
 
@@ -162,8 +162,9 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
-    def genereeri_kysimus(self):
+     def genereeri_kysimus(self):
         vastus = generate_mcq("science").split(";")
+        print(vastus)
         küsimus = vastus[0]
         valik1 = vastus[1]
         valik2 = vastus[2]
@@ -177,22 +178,53 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(küsimus))
-        layout.addWidget(QLabel(valik1))
-        layout.addWidget(QLabel(valik2))
-        layout.addWidget(QLabel(valik3))
-        layout.addWidget(QLabel(valik4))
 
-        regex = QRegExp("[A-Z]{1}")
-        validator = QRegExpValidator(regex)
-        vastamisväli = QLineEdit()
-        vastamisväli.setValidator(validator)
+        rb1 = QRadioButton(valik1)
+        rb2 = QRadioButton(valik2)
+        rb3 = QRadioButton(valik3)
+        rb4 = QRadioButton(valik4)
 
-        layout.addWidget(vastamisväli)
-        layout.addWidget(QLabel(oigeVastus))
+        button_group = QButtonGroup(dialog)
+        button_group.addButton(rb1, 1)
+        button_group.addButton(rb2, 2)
+        button_group.addButton(rb3, 3)
+        button_group.addButton(rb4, 4)
 
+        layout.addWidget(rb1)
+        layout.addWidget(rb2)
+        layout.addWidget(rb3)
+        layout.addWidget(rb4)
+
+        vasta = QPushButton('Vasta')
+        layout.addWidget(vasta)
+
+        oigeVastus2 = oigeVastus.strip('/n')
+
+        def kontrolli_vastust():
+            valitud_id = button_group.checkedId()
+
+            valitud_nupp = button_group.button(valitud_id)
+
+
+            koik = list(oigeVastus2)
+            numbrid = [int(num) for s in koik for num in re.findall(r'\d+', s)] #See AI annab iga kord erimoodi õige vastuse, see ei tööta kui õiges vastuses on nr.
+            oigeVastus = numbrid[0]
+
+            if valitud_nupp:
+                #valitud_tekst = valitud_nupp.text()
+                if valitud_id == oigeVastus:
+                    QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
+                else:
+                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {oigeVastus}')
+                dialog.accept()
+            else:
+                QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')
+
+        vasta.clicked.connect(kontrolli_vastust)
 
         dialog.setLayout(layout)
         dialog.exec_()
+
 
 
 
