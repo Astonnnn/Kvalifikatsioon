@@ -12,3 +12,5 @@ __pycache__/
 .idea/
 
 andmed.db
+
+chrome_extension

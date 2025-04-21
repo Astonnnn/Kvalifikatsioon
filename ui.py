@@ -27,9 +27,9 @@ class MainWindow(QMainWindow):
         loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
 
         self.esileht()
-        self.veebilehed()
         self.seaded()
         self.küsimused()
+        self.veebilehed()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
 
         self.create_menu_bar()
@@ -55,11 +55,8 @@ class MainWindow(QMainWindow):
         self.sisesta_nupp.clicked.connect(self.salvesta_veebileht)
         mainLayout.addLayout(sisestusväljaLayout)
 
-        self.näita_nupp = QPushButton("Näita olemasolevaid veebilehti", self)
-        self.näita_nupp.clicked.connect(kuva_veebilehed)
 
         mainLayout.addWidget(self.sisesta_nupp)
-        mainLayout.addWidget(self.näita_nupp)
 
         #sätime layouti tabile ja lisame selle QTabWidgetisse
 
@@ -71,18 +68,33 @@ class MainWindow(QMainWindow):
         layout = QGridLayout()
 
         andmed = kuva_veebilehed()
-        pealkiri1 = QLabel("Veebileht")
+        pealkiri1 = QLabel("Nr")
         pealkiri1.setFont(QFont("Arial", 14, QFont.Bold))
-        pealkiri2 = QLabel("Ajalimiit")
+        pealkiri2 = QLabel("Veebileht")
         pealkiri2.setFont(QFont("Arial", 14, QFont.Bold))
-        layout.addWidget(pealkiri1, 0, 1)
-        layout.addWidget(pealkiri2, 0, 2)
+        pealkiri3 = QLabel("Ajalimiit")
+        pealkiri3.setFont(QFont("Arial", 14, QFont.Bold))
+        pealkiri4 = QLabel("Staatus")
+        pealkiri4.setFont(QFont("Arial", 14, QFont.Bold))
+        layout.addWidget(pealkiri1, 0, 0)
+        layout.addWidget(pealkiri2, 0, 1)
+        layout.addWidget(pealkiri3, 0, 2)
+        layout.addWidget(pealkiri4, 0, 3)
 
 
+        #kuvame veebilehtede andmed aknale
         for i in range(0, len(andmed)):
             layout.addWidget(QLabel(str(andmed[i][0])), i+1, 0)
             layout.addWidget(QLabel(str(andmed[i][1])), i+1, 1)
             layout.addWidget(QLabel(str(andmed[i][2])), i+1, 2)
+            if andmed[i][3] == 0:
+                staatus_kiri = QLabel('Blokeerimata')
+                staatus_kiri.setStyleSheet("color: green")
+                layout.addWidget(staatus_kiri, i+1, 3)
+            else:
+                staatus_kiri = QLabel('Blokeeritud')
+                staatus_kiri.setStyleSheet("color: red")
+                layout.addWidget(staatus_kiri, i+1, 3)
 
         self.tab_veebilehed.setLayout(layout)
         self.tab_widget.addTab(self.tab_veebilehed, "Veebilehed")
@@ -159,6 +171,7 @@ class MainWindow(QMainWindow):
             print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
             self.veebisaidi_sisend.clear()
             self.ajalimiidi_sisend.clear()
+            self.varskenda_veebileht()
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
@@ -170,7 +183,11 @@ class MainWindow(QMainWindow):
         valik2 = vastus[2]
         valik3 = vastus[3]
         valik4 = vastus[4]
-        self.oigeVastus = vastus[5].strip(' \n\n')[-1]
+        self.oigeVastus = vastus[5].strip(' \n\n')
+        for i in self.oigeVastus[::-1]:
+            if i.isupper() == True and i in ['A','B','C','D']:
+                self.oigeVastus = i
+                break
 
         dialog = QDialog(self)
         dialog.setWindowTitle("Küsimus")
@@ -222,6 +239,12 @@ class MainWindow(QMainWindow):
 
         dialog.setLayout(layout)
         dialog.exec_()
+
+    def varskenda_veebileht(self):
+        print(self.tab_widget)
+        self.tab_widget.removeTab(self.tab_widget.indexOf(self.tab_veebilehed))
+        self.veebilehed()
+
 
 
 
