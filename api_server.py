@@ -15,8 +15,10 @@ def receive_tabs(): #see funktsioon saab chrome extensionilt andmeb lahtiolevate
         print(url)
     return jsonify({'status': 'success','tabs_received': len(data)})
 
-
+@app.route('/ping')
+def ping():
+    return "pong", 200
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run( port=5000, debug=True)
