@@ -35,3 +35,18 @@
 2. git add . (lisame kõik muutused valikusse)
 3. git commit -m "Kirjeldus" (Commitime koos kommetaariga)
 4. git push origin main
+
+
+#Serveri ja chrome extensioni tööle saamine
+
+1. Mine lehele "chrome://extensions/"
+2. Paremalt ülevalt sisse kindlasti Developer mode
+3. Siis nupule "Load unpacked"
+4. Sealt valid kausta "chrome_extension"
+
+Chromeis peaks nüüd olemas olema see laiend
+
+Et tööle saada:
+
+1. Käivita Flaski serveri fail "api_server.py"
+2. Laiend hakkab sinna iga 5 sekundi tagant saatma receive_tabs() funktsiooni saatma avatud veebilehtede url-le
