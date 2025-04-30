@@ -5,7 +5,8 @@ import re
 
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup
+    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup, QApplication, \
+    QScrollArea, QFrame
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
 
 
@@ -64,40 +65,43 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.tab_esileht, "Esileht")
 
     def veebilehed(self):
+        
         self.tab_veebilehed = QWidget()
-        layout = QGridLayout()
+        layout = QVBoxLayout(self.tab_veebilehed)
+        #kuvame veebilehtede andmed aknale
+
+
+        kerimine = QScrollArea() # kerimiskoht
+        kerimine.setWidgetResizable(True)
+        layout.addWidget(kerimine)
+
+        scroll_content = QWidget()
+        grid_layout = QGridLayout(scroll_content)
+
+        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus']
+
+        for idx, text in enumerate(pealkirjad): #Võtab indeksi ja pealkirja
+            label = QLabel(text)
+            label.setStyleSheet('font-weight: bold; font-size: 16px') # Seab pealkirja paksuks ja suuremaks
+            grid_layout.addWidget(label, 0, idx) # paneb pealkirja õigesse kohta
 
         andmed = kuva_veebilehed()
-        pealkiri1 = QLabel("Nr")
-        pealkiri1.setFont(QFont("Arial", 14, QFont.Bold))
-        pealkiri2 = QLabel("Veebileht")
-        pealkiri2.setFont(QFont("Arial", 14, QFont.Bold))
-        pealkiri3 = QLabel("Ajalimiit")
-        pealkiri3.setFont(QFont("Arial", 14, QFont.Bold))
-        pealkiri4 = QLabel("Staatus")
-        pealkiri4.setFont(QFont("Arial", 14, QFont.Bold))
-        layout.addWidget(pealkiri1, 0, 0)
-        layout.addWidget(pealkiri2, 0, 1)
-        layout.addWidget(pealkiri3, 0, 2)
-        layout.addWidget(pealkiri4, 0, 3)
+        for a, i in enumerate(andmed, start = 1): #Võtab andme indeksiga
+            jarjenr, veebileht, ajalimiit, staatus = i #lahutab andmed üksteisest
+            grid_layout.addWidget(QLabel(str(jarjenr)), a, 0)
+            grid_layout.addWidget(QLabel(veebileht), a, 1)
+            grid_layout.addWidget(QLabel(str(ajalimiit)),a, 2)
 
+            staatus_kiri = QLabel('Blokeerimata' if staatus ==0 else 'Blokeeritud')
+            staatus_kiri.setStyleSheet('color: green' if staatus == 0 else 'color: red')
+            grid_layout.addWidget(staatus_kiri, a, 3)
 
-        #kuvame veebilehtede andmed aknale
-        for i in range(0, len(andmed)):
-            layout.addWidget(QLabel(str(andmed[i][0])), i+1, 0)
-            layout.addWidget(QLabel(str(andmed[i][1])), i+1, 1)
-            layout.addWidget(QLabel(str(andmed[i][2])), i+1, 2)
-            if andmed[i][3] == 0:
-                staatus_kiri = QLabel('Blokeerimata')
-                staatus_kiri.setStyleSheet("color: green")
-                layout.addWidget(staatus_kiri, i+1, 3)
-            else:
-                staatus_kiri = QLabel('Blokeeritud')
-                staatus_kiri.setStyleSheet("color: red")
-                layout.addWidget(staatus_kiri, i+1, 3)
+        kerimine.setWidget(scroll_content)
+        kerimine.verticalScrollBar()
 
         self.tab_veebilehed.setLayout(layout)
         self.tab_widget.addTab(self.tab_veebilehed, "Veebilehed")
+
 
     def seaded(self):
         self.tab_seaded = QWidget()
