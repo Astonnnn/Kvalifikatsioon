@@ -7,6 +7,7 @@ from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
     QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup, QApplication, \
     QScrollArea, QFrame, QMenuBar
+
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
 from kusimused import *
 from database import *
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.tab_esileht, "Esileht")
 
     def veebilehed(self):
+        
         self.tab_veebilehed = QWidget()
         layout = QVBoxLayout(self.tab_veebilehed)
         #kuvame veebilehtede andmed aknale

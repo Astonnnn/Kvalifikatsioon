@@ -38,7 +38,7 @@ class Popup(QWidget):
 
             algne = time.time()
             praegune = algne
-            while praegune - algne < maksimaalneaeg: # Kontrollib et millal paneb küsimuse ette
+            while praegune - algne < maksimaalneaeg: # Kontrollib et millal paneb küsimuse ette:
                 praegune = time.time()
             self.genereeri_kysimus()
 
