@@ -1,13 +1,19 @@
+
 import subprocess
 import platform
+import time
+import re
+import sys
+
 
 def generate_mcq(topic):
     prompt = f"""Generate a multiple choice question about: {topic}.
 Requirements:
 -the output has to be on one line, with semicolons as separators
--output follows this format: Q: Question; 1) Answer1; 2) Answer2; 3) Answer3; 4) Answer4; Answer:
+-the answer to the question has to be only one letter
+-there is only one correct answer
+-output follows this format: Q: Question; A) Answer1; B) Answer2; C) Answer3; D) Answer4; Correct Answer: (A/B/C/D)
 """
-
     if platform.system() == 'Windows':
         ollama_path = r'C:\Users\aston\AppData\Local\Programs\Ollama\ollama.exe'
     else:
@@ -26,4 +32,12 @@ Requirements:
     return result.stdout
 
 generate_mcq("Science")
+
+
+
+
+
+
+
+
 

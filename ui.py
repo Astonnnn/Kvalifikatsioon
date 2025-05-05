@@ -5,16 +5,12 @@ import re
 
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup
+    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup, QApplication, \
+    QScrollArea, QFrame, QMenuBar
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
-from PyQt6.QtWidgets import QStackedWidget
-
-
-import question_manager
-from question_manager import generate_mcq
-
+from kusimused import *
 from database import *
-
+from question_manager import generate_mcq
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,9 +23,9 @@ class MainWindow(QMainWindow):
         loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
 
         self.esileht()
-        self.veebilehed()
         self.seaded()
         self.küsimused()
+        self.veebilehed()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
 
         self.create_menu_bar()
@@ -55,11 +51,8 @@ class MainWindow(QMainWindow):
         self.sisesta_nupp.clicked.connect(self.salvesta_veebileht)
         mainLayout.addLayout(sisestusväljaLayout)
 
-        self.näita_nupp = QPushButton("Näita olemasolevaid veebilehti", self)
-        self.näita_nupp.clicked.connect(kuva_veebilehed)
 
         mainLayout.addWidget(self.sisesta_nupp)
-        mainLayout.addWidget(self.näita_nupp)
 
         #sätime layouti tabile ja lisame selle QTabWidgetisse
 
@@ -68,24 +61,41 @@ class MainWindow(QMainWindow):
 
     def veebilehed(self):
         self.tab_veebilehed = QWidget()
-        layout = QGridLayout()
+        layout = QVBoxLayout(self.tab_veebilehed)
+        #kuvame veebilehtede andmed aknale
+
+
+        kerimine = QScrollArea() # kerimiskoht
+        kerimine.setWidgetResizable(True)
+        layout.addWidget(kerimine)
+
+        scroll_content = QWidget()
+        grid_layout = QGridLayout(scroll_content)
+
+        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus']
+
+        for idx, text in enumerate(pealkirjad): #Võtab indeksi ja pealkirja
+            label = QLabel(text)
+            label.setStyleSheet('font-weight: bold; font-size: 16px') # Seab pealkirja paksuks ja suuremaks
+            grid_layout.addWidget(label, 0, idx) # paneb pealkirja õigesse kohta
 
         andmed = kuva_veebilehed()
-        pealkiri1 = QLabel("Veebileht")
-        pealkiri1.setFont(QFont("Arial", 14, QFont.Bold))
-        pealkiri2 = QLabel("Ajalimiit")
-        pealkiri2.setFont(QFont("Arial", 14, QFont.Bold))
-        layout.addWidget(pealkiri1, 0, 1)
-        layout.addWidget(pealkiri2, 0, 2)
+        for a, i in enumerate(andmed, start = 1): #Võtab andme indeksiga
+            jarjenr, veebileht, ajalimiit, staatus = i #lahutab andmed üksteisest
+            grid_layout.addWidget(QLabel(str(jarjenr)), a, 0)
+            grid_layout.addWidget(QLabel(veebileht), a, 1)
+            grid_layout.addWidget(QLabel(str(ajalimiit)),a, 2)
 
+            staatus_kiri = QLabel('Blokeerimata' if staatus ==0 else 'Blokeeritud')
+            staatus_kiri.setStyleSheet('color: green' if staatus == 0 else 'color: red')
+            grid_layout.addWidget(staatus_kiri, a, 3)
 
-        for i in range(0, len(andmed)):
-            layout.addWidget(QLabel(str(andmed[i][0])), i+1, 0)
-            layout.addWidget(QLabel(str(andmed[i][1])), i+1, 1)
-            layout.addWidget(QLabel(str(andmed[i][2])), i+1, 2)
+        kerimine.setWidget(scroll_content)
+        kerimine.verticalScrollBar()
 
         self.tab_veebilehed.setLayout(layout)
         self.tab_widget.addTab(self.tab_veebilehed, "Veebilehed")
+
 
     def seaded(self):
         self.tab_seaded = QWidget()
@@ -149,31 +159,37 @@ class MainWindow(QMainWindow):
         ajalimiit = self.ajalimiidi_sisend.text().strip()
 
 
+
         if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$', veebileht):
             #Kontroll et saadakse andmed kätte
             print(f"Veebileht: {veebileht}, Ajalimiit: {ajalimiit}")
             #TULEKS LISADA TINGIMUS MIS KONTROLLIB, KAS VEEBILEHT ON JUBA LISATUD NING VASTAVALT SIIS MUUTA AEG, MITTE LISADA
 
+
             lisa_veebileht(veebileht, int(ajalimiit))
             print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
             self.veebisaidi_sisend.clear()
             self.ajalimiidi_sisend.clear()
+            self.varskenda_veebileht()
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
     def genereeri_kysimus(self):
         vastus = generate_mcq("science").split(";")
-        print(vastus)
         küsimus = vastus[0]
         valik1 = vastus[1]
         valik2 = vastus[2]
         valik3 = vastus[3]
         valik4 = vastus[4]
-        oigeVastus = vastus[5]
+        self.oigeVastus = vastus[5].strip(' \n\n')
+        for i in self.oigeVastus[::-1]:
+            if i.isupper() == True and i in ['A', 'B', 'C', 'D']:
+                self.oigeVastus = i
+                break
 
         dialog = QDialog(self)
         dialog.setWindowTitle("Küsimus")
-        dialog.setGeometry(100,100,300,150)
+        dialog.setGeometry(100, 100, 300, 150)
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(küsimus))
@@ -197,32 +213,19 @@ class MainWindow(QMainWindow):
         vasta = QPushButton('Vasta')
         layout.addWidget(vasta)
 
-        oigeVastus2 = oigeVastus.strip('/n')
-
-        print(oigeVastus2)
-
         def kontrolli_vastust():
-            #valitud_id = button_group.checkedId()
+            valitud_id = button_group.checkedId()
+            valitud_nupp = button_group.button(valitud_id)
 
-            #valitud_nupp = button_group.button(valitud_id)
+            valikud = ['A', 'B', 'C', 'D']
+            oigeVastus2 = valikud.index(self.oigeVastus)
 
-
-            koik = list(oigeVastus2)
-
-
-
-            numbrid = [int(num) for s in koik for num in re.findall(r'\d+', s)] #See AI annab iga kord erimoodi õige vastuse ja see ei tööta kui õiges vastuses on nr.
-
-            oigeVastus = numbrid[0]
-
-            print(oigeVastus2)
-
-            if oigeVastus:
-                #valitud_tekst = valitud_nupp.text()
-                if valitud_id == oigeVastus:
+            if valitud_nupp:
+                # valitud_tekst = valitud_nupp.text()
+                if valitud_id == (oigeVastus2 + 1):
                     QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
                 else:
-                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {oigeVastus}')
+                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {self.oigeVastus}')
                 dialog.accept()
             else:
                 QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')
@@ -231,5 +234,14 @@ class MainWindow(QMainWindow):
 
         dialog.setLayout(layout)
         dialog.exec_()
+
+
+    def varskenda_veebileht(self):
+        print(self.tab_widget)
+        self.tab_widget.removeTab(self.tab_widget.indexOf(self.tab_veebilehed))
+        self.veebilehed()
+
+
+
 
 

@@ -8,9 +8,19 @@ def loo_andmebaas():
         CREATE TABLE IF NOT EXISTS websites (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             veebileht TEXT NOT NULL,
-            ajalimiit INTEGER NOT NULL
+            ajalimiit INTEGER NOT NULL,
+            staatus BOOLEAN DEFAULT FALSE
         );
     ''')
+
+    connection.commit()
+    connection.close()
+
+def muuda_staatust(url):
+    connection = sqlite3.connect('andmed.db')
+    cursor = connection.cursor()
+
+    cursor.execute('UPDATE websites SET staatus = not(staatus) WHERE url = ??', (url))
 
     connection.commit()
     connection.close()
@@ -19,7 +29,7 @@ def lisa_veebileht(veebileht, ajalimiit):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
 
-    cursor.execute('INSERT INTO websites (veebileht, ajalimiit) VALUES (?, ?)', (veebileht, ajalimiit))
+    cursor.execute('INSERT INTO websites (veebileht, ajalimiit, staatus) VALUES (?, ?, ?)', (veebileht, ajalimiit, False))
 
     connection.commit() #salvestab muutused andmebaasi
     connection.close() #sulgeb ühenduse, et see jooksma ei jääks
@@ -35,5 +45,8 @@ def kuva_veebilehed():
 
 
     connection.close()
-    print(andmed)
+    #print(andmed)
     return andmed
+
+
+
