@@ -34,9 +34,9 @@ class Popup(QWidget):
             blokeeritud = blokeeritud[0]
             print(blokeeritud)
 
-            maksimaalneaeg = blokeeritud[3] * 3
-
+            maksimaalneaeg = blokeeritud[2] * 3
             algne = time.time()
+
             praegune = algne
             while praegune - algne < maksimaalneaeg: # Kontrollib et millal paneb küsimuse ette:
                 praegune = time.time()

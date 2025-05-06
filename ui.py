@@ -13,6 +13,7 @@ from kusimused import *
 from database import *
 from question_manager import generate_mcq
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         self.sisesta_nupp = QPushButton("Lisa veebileht", self)
         self.sisesta_nupp.clicked.connect(self.salvesta_veebileht)
         mainLayout.addLayout(sisestusväljaLayout)
+        QTimer.singleShot(0, self.aja_vaatamine)
 
 
         mainLayout.addWidget(self.sisesta_nupp)
@@ -59,6 +61,30 @@ class MainWindow(QMainWindow):
 
         self.tab_esileht.setLayout(mainLayout)
         self.tab_widget.addTab(self.tab_esileht, "Esileht")
+
+    def aja_vaatamine(self):
+        algne = time.time()
+        print("aja_vaatamine started")
+        koik_veebilehed = kuva_veebilehed()
+        print(koik_veebilehed)
+
+        blokeeritud = []
+        for i in koik_veebilehed: #Otsib veebilehe mis prg tööl e blokeeritud lehe
+            if i[3] == 1:
+                blokeeritud.append(i)
+
+        if blokeeritud:
+            blokeeritud = blokeeritud[0]
+            print(blokeeritud)
+
+            maksimaalneaeg = 10 #blokeeritud[2] * 60
+
+
+            praegune = algne
+            while praegune - algne < maksimaalneaeg:# Kontrollib et millal paneb küsimuse ette
+                time.sleep(1) #et asi oleks täpsem
+                praegune = time.time()
+            self.genereeri_kysimus()
 
     def veebilehed(self):
         
