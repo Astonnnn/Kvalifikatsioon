@@ -3,7 +3,7 @@ async function sendOpenTabs() {
     const pingRes = await fetch('http://127.0.0.1:5000/ping');
     if (!pingRes.ok) throw new Error("No backend");
 
-    const tabs = await chrome.tabs.query({});
+    const tabs = await chrome.tabs.query({active: true, lastFocusedWindow: true});
     const tabUrls = tabs.map(tab => tab.url);
 
     await fetch('http://127.0.0.1:5000/tabs', {

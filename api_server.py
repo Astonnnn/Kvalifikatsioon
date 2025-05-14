@@ -9,8 +9,9 @@ CORS(app)
 
 def receive_tabs(): #see funktsioon saab chrome extensionilt andmeb lahtiolevate tabide kohta
     data = request.get_json()
+    print(data)
     urls = data.get("urls", [])
-    print(f'Avatud aknad:')
+    print(f'Avatud aknad: {urls}')
     aeg_maha = kuva_veebilehed()
     koik_lehed = []
     for veebileht in aeg_maha:

@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Website blocker",
   "description": "Blokeerib veebilehti vastavalt ajale",
-  "version": "1.0",
-  "permissions": ["tabs", "webNavigation", "storage", "scripting"],
+  "version": "1.1",
+  "permissions": ["activeTab","tabs", "webNavigation", "storage", "scripting"],
   "background": {
     "service_worker": "background.js"
   },
