@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         self.sisesta_nupp = QPushButton("Lisa veebileht", self)
         self.sisesta_nupp.clicked.connect(self.salvesta_veebileht)
         mainLayout.addLayout(sisestusväljaLayout)
-        QTimer.singleShot(0, self.aja_vaatamine)
+        #QTimer.singleShot(0, self.aja_vaatamine)
 
 
         mainLayout.addWidget(self.sisesta_nupp)
@@ -75,10 +75,7 @@ class MainWindow(QMainWindow):
 
         if blokeeritud:
             blokeeritud = blokeeritud[0]
-            print(blokeeritud)
-
-            maksimaalneaeg = 10 #blokeeritud[2] * 60
-
+            maksimaalneaeg = 1 #blokeeritud[2] * 60
 
             praegune = algne
             while praegune - algne < maksimaalneaeg:# Kontrollib et millal paneb küsimuse ette
@@ -100,7 +97,7 @@ class MainWindow(QMainWindow):
         scroll_content = QWidget()
         grid_layout = QGridLayout(scroll_content)
 
-        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus']
+        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus', 'Aega jäänud']
 
         for idx, text in enumerate(pealkirjad): #Võtab indeksi ja pealkirja
             label = QLabel(text)
@@ -109,7 +106,7 @@ class MainWindow(QMainWindow):
 
         andmed = kuva_veebilehed()
         for a, i in enumerate(andmed, start = 1): #Võtab andme indeksiga
-            jarjenr, veebileht, ajalimiit, staatus = i #lahutab andmed üksteisest
+            jarjenr, veebileht, ajalimiit, staatus, jaanud_aega = i #lahutab andmed üksteisest
             grid_layout.addWidget(QLabel(str(jarjenr)), a, 0)
             grid_layout.addWidget(QLabel(veebileht), a, 1)
             grid_layout.addWidget(QLabel(str(ajalimiit)),a, 2)
