@@ -7,16 +7,19 @@ from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
     QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup, QApplication, \
     QScrollArea, QFrame, QMenuBar
-
+import requests
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
+from PyQt5.QtCore import pyqtSignal
 from kusimused import *
 from database import *
 from question_manager import generate_mcq
-
+from api_server import *
 
 class MainWindow(QMainWindow):
+    trigger_signal = pyqtSignal()
     def __init__(self):
         super().__init__()
+        self.trigger_signal.connect(self.genereeri_kysimus)
         self.setWindowTitle("Kvalifikatsioon")
         self.setGeometry(0,0,500,500) #ekraani (algusX,algusY,laius, kõrgus), tuleks ära muuta, et suurus vastavalt monitorile ja ilmumine ekraani keskele
         #self.setWindowIcon(QIcon("")) #logo
@@ -30,7 +33,9 @@ class MainWindow(QMainWindow):
         self.veebilehed()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
 
+
         self.create_menu_bar()
+
 
     def esileht(self):
         self.tab_esileht = QWidget()
@@ -62,26 +67,6 @@ class MainWindow(QMainWindow):
         self.tab_esileht.setLayout(mainLayout)
         self.tab_widget.addTab(self.tab_esileht, "Esileht")
 
-    def aja_vaatamine(self):
-        algne = time.time()
-        print("aja_vaatamine started")
-        koik_veebilehed = kuva_veebilehed()
-        print(koik_veebilehed)
-
-        blokeeritud = []
-        for i in koik_veebilehed: #Otsib veebilehe mis prg tööl e blokeeritud lehe
-            if i[3] == 1:
-                blokeeritud.append(i)
-
-        if blokeeritud:
-            blokeeritud = blokeeritud[0]
-            maksimaalneaeg = 1 #blokeeritud[2] * 60
-
-            praegune = algne
-            while praegune - algne < maksimaalneaeg:# Kontrollib et millal paneb küsimuse ette
-                time.sleep(1) #et asi oleks täpsem
-                praegune = time.time()
-            self.genereeri_kysimus()
 
     def veebilehed(self):
         
@@ -199,6 +184,7 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
+
     def genereeri_kysimus(self):
         vastus = generate_mcq("science").split(";")
         küsimus = vastus[0]
@@ -238,6 +224,7 @@ class MainWindow(QMainWindow):
         vasta = QPushButton('Vasta')
         layout.addWidget(vasta)
 
+
         def kontrolli_vastust():
             valitud_id = button_group.checkedId()
             valitud_nupp = button_group.button(valitud_id)
@@ -256,6 +243,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')
 
         vasta.clicked.connect(kontrolli_vastust)
+
 
         dialog.setLayout(layout)
         dialog.exec_()

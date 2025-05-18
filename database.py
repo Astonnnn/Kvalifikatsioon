@@ -30,12 +30,33 @@ def lisa_veebileht(veebileht, ajalimiit):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
 
-    cursor.execute('INSERT INTO websites (veebileht, ajalimiit, staatus, jaanud_aega) VALUES (?, ?, ?, ?)', (veebileht, ajalimiit, False, ajalimiit))
+    cursor.execute('INSERT INTO websites (veebileht, ajalimiit, staatus, jaanud_aega) VALUES (?, ?, ?, ?)', (veebileht, ajalimiit, False, ajalimiit*60))
 
     connection.commit() #salvestab muutused andmebaasi
     connection.close() #sulgeb ühenduse, et see jooksma ei jääks
 
 
+def muuda_aega(veebileht):
+    connection = sqlite3.connect('andmed.db')
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT jaanud_aega FROM websites WHERE veebileht = ?', (veebileht,))
+    result = cursor.fetchone()
+    uus_aeg = result[0] - 10
+    cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ? ', (uus_aeg, veebileht))
+    connection.commit()
+    connection.close()
+    return uus_aeg
+
+def taasta_aeg(veebileht):
+    connection = sqlite3.connect('andmed.db')
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT ajalimiit from websites WHERE veebileht =?', (veebileht,))
+    result = cursor.fetchone()
+    cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ?', (result[0], veebileht))
+    connection.commit()
+    connection.close()
 #andmete kogumine
 def kuva_veebilehed():
     connection = sqlite3.connect('andmed.db')
