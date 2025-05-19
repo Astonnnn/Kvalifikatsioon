@@ -3,10 +3,24 @@
 <head>
   <title>Site Blocked</title>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+      body, html {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+      }
+      #bg {
+        height: 100%;
+        width: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        }
+
   </style>
 </head>
 <body>
-  <h1>This site is blocked temporarily.</h1>
+    <div id="bg">
+    </div>
+    <script src="bingApi.js"></script>
 </body>
 </html>

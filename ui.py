@@ -10,16 +10,18 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, 
 import requests
 from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
 from PyQt5.QtCore import pyqtSignal
-from kusimused import *
+
 from database import *
 from question_manager import generate_mcq
-from api_server import *
+import api_server
+
+
 
 class MainWindow(QMainWindow):
-    trigger_signal = pyqtSignal()
+    trigger_signal = pyqtSignal() #signaal
     def __init__(self):
         super().__init__()
-        self.trigger_signal.connect(self.genereeri_kysimus)
+        self.trigger_signal.connect(self.genereeri_kysimus) #kui saab signaali genereerib küsimuse
         self.setWindowTitle("Kvalifikatsioon")
         self.setGeometry(0,0,500,500) #ekraani (algusX,algusY,laius, kõrgus), tuleks ära muuta, et suurus vastavalt monitorile ja ilmumine ekraani keskele
         #self.setWindowIcon(QIcon("")) #logo
@@ -226,6 +228,8 @@ class MainWindow(QMainWindow):
 
 
         def kontrolli_vastust():
+            global a
+            print(api_server.a)
             valitud_id = button_group.checkedId()
             valitud_nupp = button_group.button(valitud_id)
 
@@ -233,11 +237,14 @@ class MainWindow(QMainWindow):
             oigeVastus2 = valikud.index(self.oigeVastus)
 
             if valitud_nupp:
+                api_server.a = 1 #paneb uuesti aega maha lugema
                 # valitud_tekst = valitud_nupp.text()
                 if valitud_id == (oigeVastus2 + 1):
                     QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
+
                 else:
                     QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {self.oigeVastus}')
+
                 dialog.accept()
             else:
                 QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')

@@ -8,9 +8,8 @@
     "service_worker": "background.js"
   },
   "host_permissions": [
-    "https://localhost:5000/"
-  ],
-  "action": {
-    "default_popup": "block.html"
-  }
+    "https://localhost:5000/*",
+    "http://127.0.0.1:5000/*",
+    "<all_urls>"
+  ]
 }

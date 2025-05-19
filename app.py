@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QApplication
 from ui import MainWindow
 import os
 from kusimused import Popup
-from api_server import *
 import threading
+from api_server import *
 
 
 def main():
