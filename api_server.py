@@ -13,9 +13,7 @@ def set_main_window_reference(window):
     mainwindow_ref = window
     return mainwindow_ref
 
-
 a = 1 #Paneb käima recieve tabs koodi
-print(a)
 
 @app.route('/tabs',methods=['POST'])
 
@@ -33,13 +31,13 @@ def receive_tabs():#see funktsioon saab chrome extensionilt andmeb lahtiolevate 
             koik_lehed += [veebileht[1]]
         for url in urls:
             i = url.find('://')
-            url = url[i+3:] #Võtab kõik pärast //:
+            url = url[i + 3:]  # Võtab kõik pärast //:
             i = url.find('/')
-            url = url[:i] #Võtab kõik enne
+            url = url[:i]  # Võtab kõik enne
             url = url.strip('www.')
             url = url.strip()
             if url in koik_lehed:
-                for veeb in aeg_maha: #muudab staatuse tagasi üheks kui juba ei ole
+                for veeb in aeg_maha:  # muudab staatuse tagasi üheks kui juba ei ole
                     if veeb[1] == url:
                         stat = veeb[3]
                         if stat == 1:
@@ -50,7 +48,7 @@ def receive_tabs():#see funktsioon saab chrome extensionilt andmeb lahtiolevate 
                 print(aeg)
                 if aeg <= 0:
                     muuda_staatust(url)
-                    mainwindow_ref.trigger_signal.emit() #Teatab mainwindow klassile, et genereeriks kysimuse
+                    mainwindow_ref.trigger_signal.emit()  # Teatab mainwindow klassile, et genereeriks kysimuse
                     a = 0
                     print(url)
                     taasta_aeg(url)
@@ -58,11 +56,13 @@ def receive_tabs():#see funktsioon saab chrome extensionilt andmeb lahtiolevate 
             else:
                 print(f'{url} ei hakka maha võtma')
 
-        return jsonify({'status': 'success','tabs_received': len(data)})
+        return jsonify({'status': 'success', 'tabs_received': len(data)})
     else:
         data = request.get_json()
         print(f'{a} e a väärtus ei ole muutunud')
         return jsonify({'status': 'success', 'tabs_received': len(data)})
+
+
 def run_flask():
     app.run(port=5000)
 

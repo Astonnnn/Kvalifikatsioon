@@ -43,6 +43,7 @@ def muuda_aega(veebileht):
     cursor.execute('SELECT jaanud_aega FROM websites WHERE veebileht = ?', (veebileht,))
     result = cursor.fetchone()
     uus_aeg = result[0] - 5
+
     cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ? ', (uus_aeg, veebileht,))
     connection.commit()
     connection.close()
@@ -61,6 +62,7 @@ def taasta_aeg(veebileht):
     else:
         print('Ei ole olemas')
     connection.close()
+
 #andmete kogumine
 def kuva_veebilehed():
     connection = sqlite3.connect('andmed.db')
@@ -72,6 +74,4 @@ def kuva_veebilehed():
 
     connection.close()
     return andmed
-
-
 

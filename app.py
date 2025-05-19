@@ -12,7 +12,7 @@ from api_server import *
 def main():
     app = QApplication(sys.argv)  # käivitab programmi
     window = MainWindow()#kutsub ui.py klassi välja
-    window.resize(700, 800)
+    window.resize(300, 300)
     window.show() #näitab akent
     set_main_window_reference(window)
 
