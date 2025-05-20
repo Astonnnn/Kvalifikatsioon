@@ -238,6 +238,7 @@ class MainWindow(QMainWindow):
 
             if valitud_nupp:
                 api_server.a = 1 #paneb uuesti aega maha lugema
+                muuda_staatust(api_server.staatuse_muut)
                 # valitud_tekst = valitud_nupp.text()
                 if valitud_id == (oigeVastus2 + 1):
                     QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
