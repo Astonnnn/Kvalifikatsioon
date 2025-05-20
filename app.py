@@ -12,18 +12,19 @@ def main():
     window = MainWindow()
     window.resize(300, 300)
 
-    # Setup signals
     api_server.set_main_window(window)
 
     def handle_dialog(domeen):
         result = run_app(window)
+        print(result)
         if result:
             muuda_staatust(domeen)
+            taasta_aeg(domeen)
+        else:
             taasta_aeg(domeen)
 
     api_server.signals.show_dialog.connect(handle_dialog)
 
-    # Start Flask in a separate thread
     flask_thread = threading.Thread(target=api_server.run_flask, daemon=True)
     flask_thread.start()
 

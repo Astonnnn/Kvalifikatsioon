@@ -3,11 +3,10 @@ from PyQt5.QtWidgets import (
     QButtonGroup, QPushButton, QMessageBox
 )
 from question_manager import generate_mcq
-from database import *
 
 
 class QuestionDialog(QDialog):
-    def __init__(self, parent=None, ):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Küsimus")
         self.setModal(True)
@@ -78,12 +77,14 @@ class QuestionDialog(QDialog):
             self.accept()
 
 
-
-
 def run_app(parent=None):
     try:
         dialog = QuestionDialog(parent)
         dialog.exec_()
+        return dialog.result
     except Exception as e:
         print(f"Error in run_app: {e}")
         return False
+
+if __name__ == '__main__':
+    run_app()
