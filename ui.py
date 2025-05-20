@@ -1,27 +1,20 @@
 #pyQt
 
-import sys
 import re
-
-from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, QMessageBox, QLineEdit, \
-    QPushButton, QTabWidget, QFormLayout, QGridLayout, QDialog, QRadioButton, QButtonGroup, QApplication, \
-    QScrollArea, QFrame, QMenuBar
-import requests
-from PyQt5.QtGui import QIcon, QFont, QIntValidator, QRegExpValidator
-from PyQt5.QtCore import pyqtSignal
+    QPushButton, QTabWidget, QFormLayout, QGridLayout,\
+    QScrollArea
+from PyQt5.QtGui import QIntValidator
+from PyQt5.QtCore import QTimer
 
 from database import *
-from question_manager import generate_mcq
-import api_server
+
 
 
 
 class MainWindow(QMainWindow):
-    trigger_signal = pyqtSignal() #signaal
     def __init__(self):
         super().__init__()
-        self.trigger_signal.connect(self.genereeri_kysimus) #kui saab signaali genereerib küsimuse
         self.setWindowTitle("Kvalifikatsioon")
         self.setGeometry(0,0,500,500) #ekraani (algusX,algusY,laius, kõrgus), tuleks ära muuta, et suurus vastavalt monitorile ja ilmumine ekraani keskele
         #self.setWindowIcon(QIcon("")) #logo
@@ -30,10 +23,11 @@ class MainWindow(QMainWindow):
         loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
 
         self.esileht()
-        self.seaded()
-        self.küsimused()
         self.veebilehed()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
+        self.update_timer = QTimer(self)
+        self.update_timer.timeout.connect(self.varskenda_tabel)
+        self.update_timer.start(5000)
 
 
         self.create_menu_bar()
@@ -59,7 +53,6 @@ class MainWindow(QMainWindow):
         self.sisesta_nupp = QPushButton("Lisa veebileht", self)
         self.sisesta_nupp.clicked.connect(self.salvesta_veebileht)
         mainLayout.addLayout(sisestusväljaLayout)
-        #QTimer.singleShot(0, self.aja_vaatamine)
 
 
         mainLayout.addWidget(self.sisesta_nupp)
@@ -71,7 +64,7 @@ class MainWindow(QMainWindow):
 
 
     def veebilehed(self):
-        
+
         self.tab_veebilehed = QWidget()
         layout = QVBoxLayout(self.tab_veebilehed)
         #kuvame veebilehtede andmed aknale
@@ -107,31 +100,6 @@ class MainWindow(QMainWindow):
 
         self.tab_veebilehed.setLayout(layout)
         self.tab_widget.addTab(self.tab_veebilehed, "Veebilehed")
-
-
-    def seaded(self):
-        self.tab_seaded = QWidget()
-        layout = QFormLayout()
-
-        self.vanus = QLineEdit(self)
-        self.vanus.setValidator(QIntValidator())
-        layout.addRow("Vanus (aastates): ", self.vanus)
-
-
-        self.tab_seaded.setLayout(layout)
-        self.tab_widget.addTab(self.tab_seaded, "Seaded")
-
-
-    def küsimused(self):
-        self.tab_küsimused = QWidget()
-        layout = QVBoxLayout()
-
-        self.genereeri = QPushButton("Genereeri", self)
-        self.genereeri.clicked.connect(self.genereeri_kysimus)
-
-        layout.addWidget(self.genereeri)
-        self.tab_küsimused.setLayout(layout)
-        self.tab_widget.addTab(self.tab_küsimused, "Küsimused")
 
 
 
@@ -175,89 +143,15 @@ class MainWindow(QMainWindow):
         if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$', veebileht):
             #Kontroll et saadakse andmed kätte
             print(f"Veebileht: {veebileht}, Ajalimiit: {ajalimiit}")
-            #TULEKS LISADA TINGIMUS MIS KONTROLLIB, KAS VEEBILEHT ON JUBA LISATUD NING VASTAVALT SIIS MUUTA AEG, MITTE LISADA
-
 
             lisa_veebileht(veebileht, int(ajalimiit))
             print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
             self.veebisaidi_sisend.clear()
             self.ajalimiidi_sisend.clear()
-            self.varskenda_veebileht()
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
-
-    def genereeri_kysimus(self):
-        vastus = generate_mcq("science").split(";")
-        küsimus = vastus[0]
-        valik1 = vastus[1]
-        valik2 = vastus[2]
-        valik3 = vastus[3]
-        valik4 = vastus[4]
-        self.oigeVastus = vastus[5].strip(' \n\n')
-        for i in self.oigeVastus[::-1]:
-            if i.isupper() == True and i in ['A', 'B', 'C', 'D']:
-                self.oigeVastus = i
-                break
-
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Küsimus")
-        dialog.setGeometry(100, 100, 300, 150)
-
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel(küsimus))
-
-        rb1 = QRadioButton(valik1)
-        rb2 = QRadioButton(valik2)
-        rb3 = QRadioButton(valik3)
-        rb4 = QRadioButton(valik4)
-
-        button_group = QButtonGroup(dialog)
-        button_group.addButton(rb1, 1)
-        button_group.addButton(rb2, 2)
-        button_group.addButton(rb3, 3)
-        button_group.addButton(rb4, 4)
-
-        layout.addWidget(rb1)
-        layout.addWidget(rb2)
-        layout.addWidget(rb3)
-        layout.addWidget(rb4)
-
-        vasta = QPushButton('Vasta')
-        layout.addWidget(vasta)
-
-
-        def kontrolli_vastust():
-            global a
-            print(api_server.a)
-            valitud_id = button_group.checkedId()
-            valitud_nupp = button_group.button(valitud_id)
-
-            valikud = ['A', 'B', 'C', 'D']
-            oigeVastus2 = valikud.index(self.oigeVastus)
-
-            if valitud_nupp:
-                api_server.a = 1 #paneb uuesti aega maha lugema
-                muuda_staatust(api_server.staatuse_muut)
-                # valitud_tekst = valitud_nupp.text()
-                if valitud_id == (oigeVastus2 + 1):
-                    QMessageBox.information(dialog, 'Tulemus', 'Õige vastus!')
-
-                else:
-                    QMessageBox.information(dialog, 'Tulemus', f'Vale vastus! Õige oli: {self.oigeVastus}')
-
-                dialog.accept()
-            else:
-                QMessageBox.warning(dialog, 'Hoiatus', 'Palun vali vastus enne vastamist.')
-
-        vasta.clicked.connect(kontrolli_vastust)
-
-
-        dialog.setLayout(layout)
-        dialog.exec_()
-
-
-    def varskenda_veebileht(self):
+    def varskenda_tabel(self):
         print(self.tab_widget)
         self.tab_widget.removeTab(self.tab_widget.indexOf(self.tab_veebilehed))
         self.veebilehed()
