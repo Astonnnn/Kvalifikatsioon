@@ -4,7 +4,7 @@ from ui import MainWindow
 import api_server
 import threading
 from kusimused import run_app
-from database import muuda_staatust, taasta_aeg
+from database import muuda_staatust, taasta_aeg, muuda_kysimus_ees
 
 
 def main():
@@ -15,7 +15,9 @@ def main():
     api_server.set_main_window(window)
 
     def handle_dialog(domeen):
+        muuda_kysimus_ees(domeen)
         result = run_app(window)
+        muuda_kysimus_ees(domeen)
         print(result)
         if result:
             muuda_staatust(domeen)

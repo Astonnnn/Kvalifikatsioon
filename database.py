@@ -10,7 +10,8 @@ def loo_andmebaas():
             veebileht TEXT NOT NULL,
             ajalimiit INTEGER NOT NULL,
             staatus BOOLEAN DEFAULT FALSE,
-            jaanud_aega FLOAT NOT NULL
+            jaanud_aega FLOAT NOT NULL,
+            kysimus_ees BOOLEAN DEFAULT FALSE
         );
     ''')
 
@@ -95,3 +96,17 @@ def kuva_veebilehed():
 
     connection.close()
     return andmed
+
+def kustuta_veebileht(veebileht):
+    connection = sqlite3.connect('andmed.db')
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM websites where veebileht = ?', (veebileht,))
+    connection.commit()
+    connection.close()
+
+def muuda_kysimus_ees(veebileht):
+    connection = sqlite3.connect('andmed.db')
+    cursor = connection.cursor()
+    cursor.execute('UPDATE websites SET kysimus_ees = not(kysimus_ees) where veebileht = ?', (veebileht,))
+    connection.commit()
+    connection.close()

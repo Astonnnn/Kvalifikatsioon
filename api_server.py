@@ -26,27 +26,40 @@ def receive_tabs():
     aeg_maha = kuva_veebilehed()
     if request.method == 'POST':
         data = request.get_json()
-        urls = data.get("urls", [])
-        print(f'Avatud aken: {urls}')
+        url = data.get("urls", [])
+        print(f'Avatud aken: {url[0]}')
         koik_lehed = []
+        muudetud_ajad = []
         for veebileht in aeg_maha:
-            koik_lehed += [veebileht[1]]
-        for url in urls:
-            puhas_url = urlparse(url)
-            domeen = puhas_url.netloc.lstrip('www.')
-            if domeen in koik_lehed and aeg_maha[koik_lehed.index(domeen)][3] != 1:
-                print(f'{domeen} hakkan aega maha võtma')
+            domeen = veebileht[1]
+            koik_lehed += [domeen]
+
+            if veebileht[3] == 1 and not veebileht[5]:
                 aeg = muuda_aega(domeen)
-                print(aeg)
                 if aeg <= 0:
-                    muuda_staatust(domeen)
                     threading.Thread(target=koosta_kysimus, args=(domeen,), daemon=True).start()
+                muudetud_ajad.append(domeen)
+
+        print(muudetud_ajad)
+        puhas_url = urlparse(url[0])
+
+        domeen = puhas_url.netloc.lstrip('www.')
+        if (domeen in koik_lehed and aeg_maha[koik_lehed.index(domeen)][3] != 1 and not
+        aeg_maha[koik_lehed.index(domeen)][5]):
+            print(f'{domeen} hakkan aega maha võtma')
+            aeg = muuda_aega(domeen)
+            print(aeg)
+            if aeg <= 0:
+                muuda_staatust(domeen)
+                threading.Thread(target=koosta_kysimus, args=(domeen,), daemon=True).start()
 
 
-            elif domeen in koik_lehed:
-                print(f'{domeen} on blokeeritud')
-            else:
-                print(f'{domeen} pole nimekirjas')
+        elif domeen in koik_lehed:
+            print(f'{domeen} on blokeeritud')
+        else:
+            print(f'{domeen} pole nimekirjas')
+
+
         return jsonify({"status": "success"})
     else:
         blokeeritud = []

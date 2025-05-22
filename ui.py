@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, 
     QPushButton, QTabWidget, QFormLayout, QGridLayout,\
     QScrollArea
 from PyQt5.QtGui import QIntValidator
-from PyQt5.QtCore import QTimer
 
 from database import *
 
@@ -25,9 +24,6 @@ class MainWindow(QMainWindow):
         self.esileht()
         self.veebilehed()
         self.tab_widget.setCurrentWidget(self.tab_esileht)
-        self.update_timer = QTimer(self)
-        self.update_timer.timeout.connect(self.varskenda_tabel)
-        self.update_timer.start(5000)
 
 
         self.create_menu_bar()
@@ -67,17 +63,16 @@ class MainWindow(QMainWindow):
 
         self.tab_veebilehed = QWidget()
         layout = QVBoxLayout(self.tab_veebilehed)
-        #kuvame veebilehtede andmed aknale
 
 
-        kerimine = QScrollArea() # kerimiskoht
+        kerimine = QScrollArea()
         kerimine.setWidgetResizable(True)
         layout.addWidget(kerimine)
 
         scroll_content = QWidget()
         grid_layout = QGridLayout(scroll_content)
 
-        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus', 'Aega jäänud']
+        pealkirjad = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus', 'Aega jäänud', 'Kustuta']
 
         for idx, text in enumerate(pealkirjad): #Võtab indeksi ja pealkirja
             label = QLabel(text)
@@ -86,14 +81,18 @@ class MainWindow(QMainWindow):
 
         andmed = kuva_veebilehed()
         for a, i in enumerate(andmed, start = 1): #Võtab andme indeksiga
-            jarjenr, veebileht, ajalimiit, staatus, jaanud_aega = i #lahutab andmed üksteisest
-            grid_layout.addWidget(QLabel(str(jarjenr)), a, 0)
+            jarjenr, veebileht, ajalimiit, staatus, jaanud_aega, kysimus_ees = i #lahutab andmed üksteisest
+            grid_layout.addWidget(QLabel(str(a)), a, 0)
             grid_layout.addWidget(QLabel(veebileht), a, 1)
             grid_layout.addWidget(QLabel(str(ajalimiit)),a, 2)
 
             staatus_kiri = QLabel('Blokeerimata' if staatus ==0 else 'Blokeeritud')
             staatus_kiri.setStyleSheet('color: green' if staatus == 0 else 'color: red')
             grid_layout.addWidget(staatus_kiri, a, 3)
+            grid_layout.addWidget(QLabel(str(jaanud_aega)), a, 4)
+            kustuta_nupp = QPushButton('❌', self)
+            kustuta_nupp.clicked.connect(lambda _, x=veebileht: self.kustuta_ja_varskenda(x))
+            grid_layout.addWidget(kustuta_nupp, a, 5)
 
         kerimine.setWidget(scroll_content)
         kerimine.verticalScrollBar()
@@ -148,6 +147,7 @@ class MainWindow(QMainWindow):
             print(f'{veebileht} lisatud valikusse ajalimiidiga {ajalimiit} minutit.')
             self.veebisaidi_sisend.clear()
             self.ajalimiidi_sisend.clear()
+            self.varskenda_tabel()
         else:
             QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
@@ -156,6 +156,10 @@ class MainWindow(QMainWindow):
         self.tab_widget.removeTab(self.tab_widget.indexOf(self.tab_veebilehed))
         self.veebilehed()
 
+    def kustuta_ja_varskenda(self, veebileht):
+        kustuta_veebileht(veebileht)
+        print("Veebileht kustutatud!")
+        self.varskenda_tabel()
 
 
 
