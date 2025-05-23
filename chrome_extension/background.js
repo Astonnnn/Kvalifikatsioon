@@ -37,18 +37,20 @@ async function sendOpenTabs() {
 
 async function receiveBlocked() {
   try {
-    const pingRes = await fetch('http://127.0.0.1:5000/ping');
-    if (!pingRes.ok) throw new Error("No backend");
 
     const response = await fetch('http://127.0.0.1:5000/tabs', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
 
+
     const data = await response.json();
-    const lehed = data.blokeeritud
-    console.log(typeof lehed)
-    blockedSites = lehed
+    const lehed = data.Blokeeritud;
+    console.log(lehed);
+    console.log(typeof lehed);
+    blockedSites = lehed;
+
+
 
   } catch (err) {
     console.log(err)

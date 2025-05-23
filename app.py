@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import QApplication
 from ui import MainWindow
 import api_server
 import threading
-from kusimused import run_app
-from database import muuda_staatust, taasta_aeg, muuda_kysimus_ees
+from question_area import run_app
+from database import change_status, restore_time, change_question_show_status
 
 
 def main():
@@ -14,16 +14,16 @@ def main():
 
     api_server.set_main_window(window)
 
-    def handle_dialog(domeen):
-        muuda_kysimus_ees(domeen)
+    def handle_dialog(domain):
+        change_question_show_status(domain)
         result = run_app(window)
-        muuda_kysimus_ees(domeen)
+        change_question_show_status(domain)
         print(result)
         if result:
-            muuda_staatust(domeen)
-            taasta_aeg(domeen)
+            change_status(domain)
+            restore_time(domain)
         else:
-            taasta_aeg(domeen)
+            restore_time(domain)
 
     api_server.signals.show_dialog.connect(handle_dialog)
 

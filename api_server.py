@@ -17,57 +17,59 @@ def set_main_window(window):
     global signals
     signals = DialogSignals(window)
 
-def koosta_kysimus(domeen):
-    signals.show_dialog.emit(domeen)
+def generate_question(domain):
+    signals.show_dialog.emit(domain)
 
 
 @app.route('/tabs', methods=['POST', 'GET'])
 def receive_tabs():
-    aeg_maha = kuva_veebilehed()
+    website_list = show_websites()
     if request.method == 'POST':
         data = request.get_json()
         url = data.get("urls", [])
         print(f'Avatud aken: {url[0]}')
-        koik_lehed = []
-        muudetud_ajad = []
-        for veebileht in aeg_maha:
-            domeen = veebileht[1]
-            koik_lehed += [domeen]
+        all_websites = []
+        changed_websites = []
+        for website in website_list:
+            domain = website[1]
+            all_websites += [domain]
 
-            if veebileht[3] == 1 and not veebileht[5]:
-                aeg = muuda_aega(domeen)
-                if aeg <= 0:
-                    threading.Thread(target=koosta_kysimus, args=(domeen,), daemon=True).start()
-                muudetud_ajad.append(domeen)
+            if website[3] == 1 and not website[5]:
+                time = change_time(domain)
+                if time <= 0:
+                    threading.Thread(target=generate_question, args=(domain,), daemon=True).start()
+                changed_websites.append(domain)
 
-        print(muudetud_ajad)
+        print(changed_websites)
         puhas_url = urlparse(url[0])
 
-        domeen = puhas_url.netloc.lstrip('www.')
-        if (domeen in koik_lehed and aeg_maha[koik_lehed.index(domeen)][3] != 1 and not
-        aeg_maha[koik_lehed.index(domeen)][5]):
-            print(f'{domeen} hakkan aega maha võtma')
-            aeg = muuda_aega(domeen)
-            print(aeg)
-            if aeg <= 0:
-                muuda_staatust(domeen)
-                threading.Thread(target=koosta_kysimus, args=(domeen,), daemon=True).start()
+        domain = puhas_url.netloc.lstrip('www.')
+        print(domain)
+        if (domain in all_websites and website_list[all_websites.index(domain)][3] != 1 and not
+        website_list[all_websites.index(domain)][5]):
+            print(f'{domain} hakkan aega maha võtma')
+            time = change_time(domain)
+            print(time)
+            if time <= 0:
+                change_status(domain)
+                threading.Thread(target=generate_question, args=(domain,), daemon=True).start()
 
 
-        elif domeen in koik_lehed:
-            print(f'{domeen} on blokeeritud')
+        elif domain in all_websites:
+            print(f'{domain} on blokeeritud')
         else:
-            print(f'{domeen} pole nimekirjas')
+            print(f'{domain} pole nimekirjas')
 
 
         return jsonify({"status": "success"})
     else:
-        blokeeritud = []
-        for i in aeg_maha:
+        blocked = []
+        for i in website_list:
             if i[3] == 1:
-                blokeeritud += [i[1]]
-        print(f'blokeeritud on {blokeeritud}')
-        return jsonify({'blokeeritud': blokeeritud})
+                blocked += [i[1]]
+        print(f'Blokeeritud on {blocked}')
+        print(type(blocked))
+        return jsonify({'Blokeeritud': blocked})
 
 def run_flask():
     app.run(port=5000)
