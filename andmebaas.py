@@ -1,6 +1,6 @@
 import sqlite3
 
-def create_database():
+def loo_andmebaas():
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor() #aitab andmebaasist asju võtta
 
@@ -18,53 +18,52 @@ def create_database():
     connection.commit()
     connection.close()
 
-def change_status(website):
+def muuda_staatus(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
 
-    cursor.execute('UPDATE websites SET staatus = not(staatus) WHERE veebileht = ?', (website,))
+    cursor.execute('UPDATE websites SET staatus = not(staatus) WHERE veebileht = ?', (veebileht,))
 
     connection.commit()
     connection.close()
 
-def add_website_and_time(website, time):
+def lisa_veebileht_ja_aeg(veebileht, aeg):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
 
-    cursor.execute('SELECT id FROM websites WHERE veebileht = ?', (website,))
-    existing = cursor.fetchone()
-    print(existing)
+    cursor.execute('SELECT id FROM websites WHERE veebileht = ?', (veebileht,))
+    eksisteerib = cursor.fetchone()
 
-    if existing is not None:
-        cursor.execute('UPDATE websites SET ajalimiit = ?, jaanud_aega = ? WHERE veebileht = ?', (time, time*60, website))
-        print(f'Uuendati andmebaasis veebilehte: {website}')
+    if eksisteerib is not None:
+        cursor.execute('UPDATE websites SET ajalimiit = ?, jaanud_aega = ? WHERE veebileht = ?', (aeg, aeg*60, veebileht))
+        print(f'Uuendati andmebaasis veebilehte: {veebileht}')
     else:
-        cursor.execute('INSERT INTO websites (veebileht, ajalimiit, staatus, jaanud_aega) VALUES (?, ?, ?, ?)', (website, time, False, time*60))
-        print(f'Lisati andmebaasi uus veebileht: {website}')
+        cursor.execute('INSERT INTO websites (veebileht, ajalimiit, staatus, jaanud_aega) VALUES (?, ?, ?, ?)', (veebileht, aeg, False, aeg*60))
+        print(f'Lisati andmebaasi uus veebileht: {veebileht}')
 
 
     connection.commit() #salvestab muutused andmebaasi
     connection.close() #sulgeb ühenduse, et see jooksma ei jääks
 
 
-def change_time(website):
+def muuda_aeg(veebileht):
     try:
         connection = sqlite3.connect('andmed.db')
         cursor = connection.cursor()
 
-        cursor.execute('SELECT jaanud_aega FROM websites WHERE veebileht = ?', (website,))
-        result = cursor.fetchone()
+        cursor.execute('SELECT jaanud_aega FROM websites WHERE veebileht = ?', (veebileht,))
+        tulemus = cursor.fetchone()
 
-        if result is None:
+        if tulemus is None:
             print(f'Veebisait puudub andmebaasist')
             return 0
 
-        new_time = result[0] - 5
+        uus_aeg = tulemus[0] - 5
 
-        cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ? ', (new_time, website,))
+        cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ? ', (uus_aeg, veebileht,))
         connection.commit()
         connection.close()
-        return new_time
+        return uus_aeg
 
     except Exception as e:
         print(f'Probleem aja uuendamises: {e}')
@@ -72,42 +71,42 @@ def change_time(website):
             connection.close()
         return 0
 
-def restore_time(website):
+def taasta_aeg(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
-    cursor.execute('SELECT ajalimiit from websites WHERE veebileht = ?', (website,))
-    result = cursor.fetchone()
+    cursor.execute('SELECT ajalimiit from websites WHERE veebileht = ?', (veebileht,))
+    tulemus = cursor.fetchone()
 
-    if result is not None:
-        time = result[0]*60
-        cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ?', (time, website,))
+    if tulemus is not None:
+        aeg = tulemus[0]*60
+        cursor.execute('UPDATE websites SET jaanud_aega = ? WHERE veebileht = ?', (aeg, veebileht,))
         connection.commit()
     else:
         print('Ei ole olemas')
     connection.close()
 
-#andmete kogumine
-def show_websites():
+
+def kuva_veebilehed():
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
 
     cursor.execute('SELECT * FROM websites') #Käivitab sql käsklusi ning muudab andmebaasi
-    data = cursor.fetchall()
+    andmed = cursor.fetchall()
 
 
     connection.close()
-    return data
+    return andmed
 
-def delete_website(website):
+def kustuta_veebileht(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM websites where veebileht = ?', (website,))
+    cursor.execute('DELETE FROM websites where veebileht = ?', (veebileht,))
     connection.commit()
     connection.close()
 
-def change_question_show_status(website):
+def muuda_küsimise_kuvamise_staatus(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
-    cursor.execute('UPDATE websites SET kysimus_ees = not(kysimus_ees) where veebileht = ?', (website,))
+    cursor.execute('UPDATE websites SET kysimus_ees = not(kysimus_ees) where veebileht = ?', (veebileht,))
     connection.commit()
     connection.close()

@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import QApplication
 from ui import MainWindow
 import api_server
 import threading
-from question_area import run_app
-from database import change_status, restore_time, change_question_show_status
+from küsimuse_kast import run_app
+from andmebaas import muuda_staatus, taasta_aeg, muuda_küsimise_kuvamise_staatus
 
 
 def main():
@@ -14,16 +14,16 @@ def main():
 
     api_server.set_main_window(window)
 
-    def handle_dialog(domain):
-        change_question_show_status(domain)
-        result = run_app(window)
-        change_question_show_status(domain)
-        print(result)
-        if result:
-            change_status(domain)
-            restore_time(domain)
+    def handle_dialog(veebileht):
+        muuda_küsimise_kuvamise_staatus(veebileht)
+        tulemus = run_app(window)
+        muuda_küsimise_kuvamise_staatus(veebileht)
+        print(tulemus)
+        if tulemus:
+            muuda_staatus(veebileht)
+            taasta_aeg(veebileht)
         else:
-            restore_time(domain)
+            taasta_aeg(veebileht)
 
     api_server.signals.show_dialog.connect(handle_dialog)
 

@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QVBoxLayout, QAction, 
     QScrollArea, QHBoxLayout
 from PyQt5.QtGui import QIcon
 
-from components import ModernLabel, ModernLineEdit, ModernNumberInput, ModernButton, main_window_style, menu_bar_style
-from database import *
+from stiili_komponendid import disainiga_tekst, disainiga_sisestusväli, disainiga_sisestusväli_number, disainiga_nupp, peaakna_disain, menüü_bari_kujundus
+from andmebaas import *
 
 
 
@@ -21,25 +21,25 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(r'logod/peaaknaLogo.png'))
         self.setGeometry(100, 100, 1000, 900) #ekraani (algusX,algusY,laius, kõrgus), tuleks ära muuta, et suurus vastavalt monitorile ja ilmumine ekraani keskele
         self.setMinimumSize(900, 900)
-        self.setStyleSheet(main_window_style())
+        self.setStyleSheet(peaakna_disain())
 
-        self.tab_widget = QTabWidget()
-        self.setCentralWidget(self.tab_widget)
+        self.tab_vidin = QTabWidget()
+        self.setCentralWidget(self.tab_vidin)
 
-        create_database()  # oleme kindlad, et andmebaas luuakse
+        loo_andmebaas()  # oleme kindlad, et andmebaas luuakse
 
-        self.frontpage()
-        self.websites()
-        self.tab_widget.setCurrentWidget(self.tab_frontpage)
+        self.esileht()
+        self.veebilehed()
+        self.tab_vidin.setCurrentWidget(self.tab_esileht)
 
 
         self.create_menu_bar()
 
 
-    def frontpage(self):
-        self.tab_frontpage = QWidget()
+    def esileht(self):
+        self.tab_esileht = QWidget()
 
-        self.tab_frontpage.setStyleSheet("""
+        self.tab_esileht.setStyleSheet("""
             QWidget {
                 background: white;
                 border-radius: 20px; 
@@ -48,139 +48,171 @@ class MainWindow(QMainWindow):
         """)
 
 
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(40, 40, 40, 40)
+        peamine_paigutus = QVBoxLayout()
+        peamine_paigutus.setSpacing(30)
+        peamine_paigutus.setContentsMargins(40, 40, 40, 40)
 
         #Tiitel
 
-        title_layout = QVBoxLayout()
-        title_layout.setAlignment(Qt.AlignCenter)
+        tiitli_paigutus = QVBoxLayout()
+        tiitli_paigutus.setAlignment(Qt.AlignCenter)
 
-        title = ModernLabel("Lisa uus veebileht", "title")
-        title.setAlignment(Qt.AlignCenter)
-        subtitle = ModernLabel("Määra ajalimiite veebilehtedele ning vähenda ekraaniaega", "normal")
-        subtitle.setAlignment(Qt.AlignCenter)
-        subtitle.setStyleSheet("color: #718096; font-size: 16px; margin-bottom: 20px;")
+        tiitel = disainiga_tekst("Lisa uus veebileht", "title")
+        tiitel.setAlignment(Qt.AlignCenter)
+        alamtiitel = disainiga_tekst("Määra ajalimiite veebilehtedele ning vähenda ekraaniaega", "normal")
+        alamtiitel.setAlignment(Qt.AlignCenter)
+        alamtiitel.setStyleSheet("color: #718096; font-size: 16px; margin-bottom: 20px;")
 
-        title_layout.addWidget(title)
-        title_layout.addWidget(subtitle)
-        main_layout.addLayout(title_layout)
+        tiitli_paigutus.addWidget(tiitel)
+        tiitli_paigutus.addWidget(alamtiitel)
+        peamine_paigutus.addLayout(tiitli_paigutus)
 
 
         #Sisestusväljad
-        form_widget = QWidget()
+        sisestusvälja_vidin = QWidget()
 
-        form_layout = QVBoxLayout(form_widget)
-        form_layout.setSpacing(20)
+        sisestusvälja_paigutus= QVBoxLayout(sisestusvälja_vidin)
+        sisestusvälja_paigutus.setSpacing(20)
 
         #URL/veebilehe sisestus
 
-        url_layout = QVBoxLayout()
-        url_label = ModernLabel("Sisesta veebisaidi URL:", "header")
-        self.website_input = ModernLineEdit("nt. youtube.com")
-        url_layout.addWidget(url_label)
-        url_layout.addWidget(self.website_input)
+        url_paigutus = QVBoxLayout()
+        url_pealkiri = disainiga_tekst("Sisesta veebisaidi URL:", "header")
+        self.url_sisestusväli= disainiga_sisestusväli("nt. youtube.com")
+        url_paigutus.addWidget(url_pealkiri)
+        url_paigutus.addWidget(self.url_sisestusväli)
 
         #Ajalimiidi sisestus
 
-        time_layout = QVBoxLayout()
-        time_label = ModernLabel("Sisesta ajalimiit (min):", "header")
-        self.time_input = ModernNumberInput("nt. 30", min_value=1, max_value=120)
-        time_layout.addWidget(time_label)
-        time_layout.addWidget(self.time_input)
+        aja_paigutus = QVBoxLayout()
+        aja_pealkiri = disainiga_tekst("Sisesta ajalimiit (min):", "header")
+        self.aja_sisestusväli= disainiga_sisestusväli_number("nt. 30", vähim_väärtus=1, suurim_väärtus=120)
+        aja_paigutus.addWidget(aja_pealkiri)
+        aja_paigutus.addWidget(self.aja_sisestusväli)
 
-        form_layout.addLayout(url_layout)
-        form_layout.addLayout(time_layout)
+        sisestusvälja_paigutus.addLayout(url_paigutus)
+        sisestusvälja_paigutus.addLayout(aja_paigutus)
 
         #Sisestusnupp
 
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        self.confirm_button = ModernButton("Lisa veebileht", "normal")
-        self.confirm_button.clicked.connect(self.save_website)
-        self.confirm_button.setMinimumWidth(150)
-        button_layout.addWidget(self.confirm_button)
-        button_layout.addStretch()
+        sisestusnupu_paigutus = QHBoxLayout()
+        sisestusnupu_paigutus.addStretch()
+        self.sisestusnupp = disainiga_nupp("Lisa veebileht", "normal")
+        self.sisestusnupp.clicked.connect(self.salvesta_veebileht)
+        self.sisestusnupp.setMinimumWidth(150)
+        sisestusnupu_paigutus.addWidget(self.sisestusnupp)
+        sisestusnupu_paigutus.addStretch()
 
-        form_layout.addLayout(button_layout)
-        main_layout.addWidget(form_widget)
+        sisestusvälja_paigutus.addLayout(sisestusnupu_paigutus)
+        peamine_paigutus.addWidget(sisestusvälja_vidin)
 
         #Lisame kõik alamjaotused main_layouti
 
-        self.tab_frontpage.setLayout(main_layout)
-        self.tab_widget.addTab(self.tab_frontpage, "Esileht")
+        self.tab_esileht.setLayout(peamine_paigutus)
+        self.tab_vidin.addTab(self.tab_esileht, "➕ Esileht")
 
 
-    def websites(self):
+    def veebilehed(self):
 
-        self.tab_websites = QWidget()
-        layout = QVBoxLayout(self.tab_websites)
+        self.tab_veebilehed = QWidget()
+        self.tab_veebilehed.setStyleSheet("""
+            QWidget {
+                background: white;
+                border-radius: 20px;
+                margin: 10px
+            }
+        """)
+
+        paigutus = QVBoxLayout()
+        paigutus.setContentsMargins(40, 40, 40, 40)
+        paigutus.setSpacing(25)
+
+        #Pealkiri
+
+        pealkirja_paigutus = QVBoxLayout()
+        pealkirja_paigutus.setAlignment(Qt.AlignCenter)
+
+        pealkiri = disainiga_tekst("Hallatavad veebisaidid", "title")
+        pealkiri.setAlignment(Qt.AlignCenter)
+        pealkirja_paigutus.addWidget(pealkiri)
+        paigutus.addLayout(pealkirja_paigutus)
+
+        #Tulba pealkirjad
+
+        tulba_tiitlid = ['#', 'Veebileht', 'Ajalimiit', 'Staatus', 'Aega jäänud', 'Kustuta']
+        tulba_pealkirja_paigutus = QGridLayout()
+        for idx, text in enumerate(tulba_tiitlid):  # Võtab indeksi ja pealkirja
+            pealkiri = disainiga_tekst(text, "table_header")
+            tulba_pealkirja_paigutus.addWidget(pealkiri, 0, idx)
+
+        paigutus.addLayout(tulba_pealkirja_paigutus)
+
+        kerimisala = QScrollArea()
+        kerimisala.setWidgetResizable(True)
+        paigutus.addWidget(kerimisala)
+
+        kerimise_sisu = QWidget()
+        tabeli_paigutus = QGridLayout()
+        tabeli_paigutus.setAlignment(Qt.AlignTop)
+        kerimise_sisu.setLayout(tabeli_paigutus)
 
 
-        scrollArea = QScrollArea()
-        scrollArea.setWidgetResizable(True)
-        layout.addWidget(scrollArea)
+         # paneb pealkirja õigesse kohta
 
-        scroll_content = QWidget()
-        grid_layout = QGridLayout(scroll_content)
+        andmed = kuva_veebilehed()
+        for a, i in enumerate(andmed, start = 1): #Võtab andme indeksiga
+            järje_nr, veebileht, aja_limiit, staatus, jäänud_aeg, küsimus_kuvatud = i #lahutab andmed üksteisest
+            tabeli_paigutus.addWidget(disainiga_tekst(str(a), "normal"), a, 0)
+            tabeli_paigutus.addWidget(disainiga_tekst(veebileht, "normal"), a, 1)
+            tabeli_paigutus.addWidget(disainiga_tekst(f'{str(aja_limiit)} min' , "normal"),a, 2)
 
-        titles = ['Nr', 'Veebileht', 'Ajalimiit', 'Staatus', 'Aega jäänud', 'Kustuta']
+            staatuse_olek = disainiga_tekst('Blokeerimata' if staatus ==0 else 'Blokeeritud', "normal")
+            staatuse_olek.setStyleSheet('color: green' if staatus == 0 else 'color: red')
+            tabeli_paigutus.addWidget(staatuse_olek, a, 3)
+            tabeli_paigutus.addWidget(disainiga_tekst(f'{str(round(jäänud_aeg/60, 1))} min', "normal"), a, 4)
+            kustuta_nupp = disainiga_nupp('❌', "delete")
+            kustuta_nupp.clicked.connect(lambda _, x=veebileht: self.kustuta_ja_värskenda(x))
+            tabeli_paigutus.addWidget(kustuta_nupp, a, 5)
 
-        for idx, text in enumerate(titles): #Võtab indeksi ja pealkirja
-            label = QLabel(text)
-            label.setStyleSheet('font-weight: bold; font-size: 16px') # Seab pealkirja paksuks ja suuremaks
-            grid_layout.addWidget(label, 0, idx) # paneb pealkirja õigesse kohta
+        kerimisala.setWidget(kerimise_sisu)
+        kerimisala.verticalScrollBar()
 
-        data = show_websites()
-        for a, i in enumerate(data, start = 1): #Võtab andme indeksiga
-            lineNr, website, time_limit, status, remaining_time, question_showing = i #lahutab andmed üksteisest
-            grid_layout.addWidget(QLabel(str(a)), a, 0)
-            grid_layout.addWidget(QLabel(website), a, 1)
-            grid_layout.addWidget(QLabel(str(time_limit)),a, 2)
 
-            status_label = QLabel('Blokeerimata' if status ==0 else 'Blokeeritud')
-            status_label.setStyleSheet('color: green' if status == 0 else 'color: red')
-            grid_layout.addWidget(status_label, a, 3)
-            grid_layout.addWidget(QLabel(str(remaining_time)), a, 4)
-            delete_button = ModernButton('❌', "delete")
-            delete_button.clicked.connect(lambda _, x=website: self.delete_and_refresh(x))
-            grid_layout.addWidget(delete_button, a, 5)
+        self.värskenda_nupp = disainiga_nupp("Värskenda 🔄", "normal")
+        self.värskenda_nupp.clicked.connect(lambda: (self.varskenda_tabel(), self.tab_vidin.setCurrentWidget(self.tab_veebilehed)))
+        paigutus.addWidget(self.värskenda_nupp)
 
-        scrollArea.setWidget(scroll_content)
-        scrollArea.verticalScrollBar()
-
-        self.tab_websites.setLayout(layout)
-        self.tab_widget.addTab(self.tab_websites, "Veebilehed")
+        self.tab_veebilehed.setLayout(paigutus)
+        self.tab_vidin.addTab(self.tab_veebilehed, "🌐 Veebilehed")
 
 
 
     def create_menu_bar(self):
         #LOOME MENÜÜ
-        menu_bar = self.menuBar() #loob menüübari, sinna saab lisada veel dropdowne
-        menu_bar.setStyleSheet(menu_bar_style())
+        menüü_loend = self.menuBar() #loob menüübari, sinna saab lisada veel dropdowne
+        menüü_loend.setStyleSheet(menüü_bari_kujundus())
 
-        file_menu = menu_bar.addMenu("Menüü 🏠") #lisab menüübaari menüü
+        faili_menüü = menüü_loend.addMenu("Menüü 🏠") #lisab menüübaari menüü
 
         #LOOME JUHTUMISED
-        help_action = QAction("Abi ❓", self)
-        exit_action = QAction("Lahku 🚪", self)
+        abi = QAction("Abi ❓", self)
+        lahku = QAction("Lahku 🚪", self)
 
 
         #ühendame sündmused liikmetega
 
-        help_action.triggered.connect(self.help_menu)
-        exit_action.triggered.connect(self.close_app)
+        abi.triggered.connect(self.abi_menyy)
+        lahku.triggered.connect(self.sulge_rakendus)
 
         #LISAME JUHTUMISED MENÜÜSSE
 
-        file_menu.addAction(help_action)
-        file_menu.addSeparator()
-        file_menu.addAction(exit_action)
+        faili_menüü.addAction(abi)
+        faili_menüü.addSeparator()
+        faili_menüü.addAction(lahku)
 
 
     # loome sündmused menüü liikmete jaoks
-    def help_menu(self):
+    def abi_menyy(self):
         msg = QMessageBox()
         msg.setWindowTitle("Abi")
         msg.setText("""
@@ -204,36 +236,39 @@ class MainWindow(QMainWindow):
                 """)
         msg.exec_()
 
-    def close_app(self):
-        print("Väljumine võtab aset")
+    def sulge_rakendus(self):
         self.close()
 
-    def save_website(self):
-        website = self.website_input.text().strip()
-        time_limit = self.time_input.text().strip()
+    def salvesta_veebileht(self):
+        veebileht = self.url_sisestusväli.text().strip()
+        aja_limiit = self.aja_sisestusväli.text().strip()
 
 
 
-        if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$', website):
+        if re.match(r'^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$', veebileht):
             #Kontroll et saadakse andmed kätte
-            print(f"Veebileht: {website}, Ajalimiit: {time_limit}")
+            print(f"Veebileht: {veebileht}, Ajalimiit: {aja_limiit}")
 
-            add_website_and_time(website, int(time_limit))
-            self.website_input.clear()
-            self.time_input.clear()
-            self.refresh_table()
+            lisa_veebileht_ja_aeg(veebileht, int(aja_limiit))
+            self.url_sisestusväli.clear()
+            self.aja_sisestusväli.clear()
+            self.varskenda_tabel()
         else:
-            QMessageBox.warning(self, "Error", "Sisesta website korrektses formaadis!")
+            QMessageBox.warning(self, "Error", "Sisesta veebileht korrektses formaadis!")
 
-    def refresh_table(self):
-        print(self.tab_widget)
-        self.tab_widget.removeTab(self.tab_widget.indexOf(self.tab_websites))
-        self.websites()
+    def varskenda_tabel(self):
+        print(self.tab_vidin)
+        self.tab_vidin.removeTab(self.tab_vidin.indexOf(self.tab_veebilehed))
+        self.veebilehed()
 
-    def delete_and_refresh(self, website):
-        delete_website(website)
+    def kustuta_ja_värskenda(self, veebileht):
+        kustuta_veebileht(veebileht)
         print("Veebileht kustutatud!")
-        self.refresh_table()
+        self.varskenda_tabel()
+        self.kuva_veebilehtede_tabel()
+
+    def kuva_veebilehtede_tabel(self):
+        self.tab_vidin.setCurrentWidget(self.tab_veebilehed)
 
 
 

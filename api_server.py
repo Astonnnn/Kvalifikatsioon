@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from database import *
+from andmebaas import *
 from urllib.parse import urlparse
 import threading
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -17,59 +17,60 @@ def set_main_window(window):
     global signals
     signals = DialogSignals(window)
 
-def generate_question(domain):
-    signals.show_dialog.emit(domain)
+def generate_question(veebileht):
+    signals.show_dialog.emit(veebileht)
 
 
 @app.route('/tabs', methods=['POST', 'GET'])
 def receive_tabs():
-    website_list = show_websites()
+    andmebaasi_andmed = kuva_veebilehed()
     if request.method == 'POST':
-        data = request.get_json()
-        url = data.get("urls", [])
-        print(f'Avatud aken: {url[0]}')
-        all_websites = []
-        changed_websites = []
-        for website in website_list:
-            domain = website[1]
-            all_websites += [domain]
+        andmed = request.get_json()
+        aktiivne_veebileht = andmed.get("urls", [])
+        print(f'Avatud aken: {aktiivne_veebileht[0]}')
+        andmebaasi_veebilehed = [] #Siia kõik andmebaasis olevate veebilehtede URLid
 
-            if website[3] == 1 and not website[5]:
-                time = change_time(domain)
-                if time <= 0:
-                    threading.Thread(target=generate_question, args=(domain,), daemon=True).start()
-                changed_websites.append(domain)
+        for andmebaasi_rida in andmebaasi_andmed:
+            veebileht = andmebaasi_rida[1]
+            andmebaasi_veebilehed += [veebileht]
 
-        print(changed_websites)
-        puhas_url = urlparse(url[0])
+            #Võtame blokeeritud veebilehtedelt aega maha
+            if andmebaasi_rida[3] == 1 and not andmebaasi_rida[5]:
+                aeg = muuda_aeg(veebileht)
+                if aeg <= 0:
+                    threading.Thread(target=generate_question, args=(veebileht,), daemon=True).start()
 
-        domain = puhas_url.netloc.lstrip('www.')
-        print(domain)
-        if (domain in all_websites and website_list[all_websites.index(domain)][3] != 1 and not
-        website_list[all_websites.index(domain)][5]):
-            print(f'{domain} hakkan aega maha võtma')
-            time = change_time(domain)
-            print(time)
-            if time <= 0:
-                change_status(domain)
-                threading.Thread(target=generate_question, args=(domain,), daemon=True).start()
+        puhas_url = urlparse(aktiivne_veebileht[0])
+
+        veebileht = puhas_url.netloc.lstrip('www.')
+
+        if (veebileht in andmebaasi_veebilehed and andmebaasi_andmed[andmebaasi_veebilehed.index(veebileht)][3] != 1 and not
+        andmebaasi_andmed[andmebaasi_veebilehed.index(veebileht)][5]):
+            print(f'{veebileht} hakkan aega maha võtma')
+            aeg = muuda_aeg(veebileht)
 
 
-        elif domain in all_websites:
-            print(f'{domain} on blokeeritud')
+            #Võtab aktiivselt lehelt aega maha
+            if aeg <= 0:
+                muuda_staatus(veebileht)
+                threading.Thread(target=generate_question, args=(veebileht,), daemon=True).start()
+
+
+        elif veebileht in andmebaasi_veebilehed:
+            print(f'{veebileht} on blokeeritud')
         else:
-            print(f'{domain} pole nimekirjas')
+            print(f'{veebileht} pole nimekirjas')
 
 
         return jsonify({"status": "success"})
+
     else:
-        blocked = []
-        for i in website_list:
+        blokeeritud = []
+        for i in andmebaasi_andmed:
             if i[3] == 1:
-                blocked += [i[1]]
-        print(f'Blokeeritud on {blocked}')
-        print(type(blocked))
-        return jsonify({'Blokeeritud': blocked})
+                blokeeritud += [i[1]]
+        print(f'Blokeeritud on {blokeeritud}')
+        return jsonify({'Blokeeritud': blokeeritud}) #Tagastab chrome extensionile nimekirja blokeeritud veebilehtedega
 
 def run_flask():
     app.run(port=5000)

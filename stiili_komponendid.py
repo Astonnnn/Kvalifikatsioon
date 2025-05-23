@@ -5,7 +5,7 @@ from PyQt5.QtGui import QFont, QIntValidator
 from PyQt5.QtCore import Qt
 
 
-def main_window_style():
+def peaakna_disain():
     return """
         QMainWindow {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -36,7 +36,7 @@ def main_window_style():
             }
     """
 
-def menu_bar_style():
+def menüü_bari_kujundus():
     return """
         QMenuBar {
             background: white;
@@ -75,18 +75,18 @@ def menu_bar_style():
 
 
 
-class ModernButton(QPushButton):
-    def __init__(self, text, button_type="normal"):
+class disainiga_nupp(QPushButton):
+    def __init__(self, text, nupu_liik="normal"):
         super().__init__(text)
-        self.button_type = button_type
+        self.nupu_liik = nupu_liik
         self.setFont(QFont("Segoe UI", 10, QFont.Medium))
         self.setCursor(Qt.PointingHandCursor)
         self.setMinimumHeight(45)
-        self.apply_style()
+        self.stiilid()
 
 
-    def apply_style(self):
-        if self.button_type == "normal":
+    def stiilid(self):
+        if self.nupu_liik == "normal":
             self.setStyleSheet("""
                 QPushButton {
                     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -108,7 +108,7 @@ class ModernButton(QPushButton):
                                 stop:0 #4c5bc6, stop:1 #5e3a7e);
                 }
             """)
-        elif self.button_type == "delete":
+        elif self.nupu_liik == "delete":
             self.setStyleSheet("""
                             QPushButton {
                                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
@@ -134,10 +134,10 @@ class ModernButton(QPushButton):
                             }
                             """)
 
-class ModernLineEdit(QLineEdit):
-    def __init__(self, placeholder=""):
+class disainiga_sisestusväli(QLineEdit):
+    def __init__(self, kohahoidja=""):
         super().__init__()
-        self.setPlaceholderText(placeholder)
+        self.setPlaceholderText(kohahoidja)
         self.setFont(QFont("Segoe UI", 11))
         self.setMinimumHeight(45)
         self.setStyleSheet("""
@@ -157,21 +157,21 @@ class ModernLineEdit(QLineEdit):
         """)
 
 
-class ModernNumberInput(ModernLineEdit):
-    def __init__(self, placeholder="", min_value=1, max_value=9999):
-        super().__init__(placeholder)
-        validator = QIntValidator(min_value, max_value)
+class disainiga_sisestusväli_number(disainiga_sisestusväli):
+    def __init__(self, kohahoidja="", vähim_väärtus=1, suurim_väärtus=9999):
+        super().__init__(kohahoidja)
+        validator = QIntValidator(vähim_väärtus, suurim_väärtus)
         self.setValidator(validator)
 
 
-class ModernLabel(QLabel):
-    def __init__(self, text, label_type="normal"):
+class disainiga_tekst(QLabel):
+    def __init__(self, text, teksti_liik="normal"):
         super().__init__(text)
-        self.label_type = label_type
-        self.apply_style()
+        self.teksti_liik = teksti_liik
+        self.stiilid()
 
-    def apply_style(self):
-        if self.label_type == "title":
+    def stiilid(self):
+        if self.teksti_liik == "title":
             self.setFont(QFont("Segoe UI", 24, QFont.Bold))
             self.setStyleSheet("""
                 QLabel {
@@ -183,7 +183,7 @@ class ModernLabel(QLabel):
                     background-clip: text;
                 }
             """)
-        elif self.label_type == "header":
+        elif self.teksti_liik == "header":
             self.setFont(QFont("Segoe UI", 16, QFont.DemiBold))
             self.setStyleSheet("""
                 QLabel {
@@ -192,7 +192,17 @@ class ModernLabel(QLabel):
                     padding: 8px 0;
                 }
             """)
-        else:  # normal
+        elif self.teksti_liik == "table_header":
+            self.setFont(QFont("Segoe UI", 12, QFont.Bold))
+            self.setStyleSheet("""
+                QLabel {
+                    color: #2d3748;
+                    padding: 12px 8px;
+                    background-color: rgba(102, 126, 234, 0.1);
+                    border-radius: 8px;
+                }
+            """)
+        else:  # tavaline
             self.setFont(QFont("Segoe UI", 11))
             self.setStyleSheet("""
                 QLabel {

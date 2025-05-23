@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (
     QApplication, QDialog, QLabel, QVBoxLayout, QRadioButton,
     QButtonGroup, QPushButton, QMessageBox
 )
-from question_manager import generate_mcq
+from küsimuse_genereerija import genereeri_valikvastustega_küsimus
 
 
 class QuestionDialog(QDialog):
@@ -13,13 +13,13 @@ class QuestionDialog(QDialog):
         self.setGeometry(100, 100, 300, 200)
         self.result = None
 
-        self.setup_ui()
+        self.käivita_kasutajaliides()
 
-    def setup_ui(self):
-        layout = QVBoxLayout()
+    def käivita_kasutajaliides(self):
+        paigutus = QVBoxLayout()
 
         try:
-            vastus = generate_mcq("science").split(";")
+            vastus = genereeri_valikvastustega_küsimus("science").split(";")
             if len(vastus) < 6:
                 raise ValueError("Invalid question format")
 
@@ -32,7 +32,7 @@ class QuestionDialog(QDialog):
                     self.oigeVastus = i
                     break
 
-            layout.addWidget(QLabel(küsimus))
+            paigutus.addWidget(QLabel(küsimus))
 
             self.button_group = QButtonGroup(self)
             self.rb = []
@@ -40,19 +40,19 @@ class QuestionDialog(QDialog):
             for i, valik in enumerate([valik1, valik2, valik3, valik4]):
                 rb = QRadioButton(valik)
                 self.button_group.addButton(rb, i)
-                layout.addWidget(rb)
+                paigutus.addWidget(rb)
                 self.rb.append(rb)
 
             self.vasta_button = QPushButton("Vasta")
             self.vasta_button.clicked.connect(self.kontrolli_vastust)
-            layout.addWidget(self.vasta_button)
+            paigutus.addWidget(self.vasta_button)
 
         except Exception as e:
-            print(f"Error generating question: {e}")
-            layout.addWidget(QLabel("Viga küsimuse genereerimisel"))
+            print(f"Viga küsimuse genereerimisel: {e}")
+            paigutus.addWidget(QLabel("Viga küsimuse genereerimisel"))
             self.result = False
 
-        self.setLayout(layout)
+        self.setLayout(paigutus)
 
     def kontrolli_vastust(self):
         if not hasattr(self, 'button_group'):

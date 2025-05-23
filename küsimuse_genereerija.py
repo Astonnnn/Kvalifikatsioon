@@ -6,8 +6,8 @@ import re
 import sys
 
 
-def generate_mcq(topic):
-    prompt = f"""Generate a multiple choice question about: {topic}.
+def genereeri_valikvastustega_küsimus(teema):
+    prompt = f"""Generate a multiple choice question about: {teema}.
 Requirements:
 -the output has to be on one line, with semicolons as separators
 -the answer to the question has to be only one letter
@@ -27,12 +27,10 @@ Requirements:
         stderr=subprocess.PIPE,
         encoding='UTF-8'
     ) # kontrollib mis platform on ja siis saame mõlemad oma arvutis tööle
-    print(type(result.stdout))
     print(result.stdout)
     return result.stdout
 
-generate_mcq("Science")
-
+genereeri_valikvastustega_küsimus("science")
 
 
 
