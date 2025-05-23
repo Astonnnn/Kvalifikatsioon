@@ -6,7 +6,7 @@ Rakendus, mis aitab kasutajatel hallata veebilehtedel veedetud aega. Rakendus j�
 
 * Frontend: PyQt5
 
-* Brauseri integratsioon: Chrome'i laiend ja BingAPI
+* Brauseri integratsioon: Chrome'i laiend ja BingAPI, et kuvada iga päev erinev pilt
 
 * AI: Ollama koos Mistral mudeliga küsimuste genereerimiseks, töötab lokaalselt
 
