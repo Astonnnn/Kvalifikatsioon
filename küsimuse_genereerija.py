@@ -16,7 +16,7 @@ Requirements:
 -output follows this format: Q: Question; A) Answer1; B) Answer2; C) Answer3; D) Answer4; Correct Answer: (A/B/C/D)
 """
     if platform.system() == 'Windows':
-        ollama_path = r'ollama.exe'
+        ollama_path = r'ollama.exe' #Kui ei tööta, siis asendada absoluutse failiteega
     else:
         ollama_path = 'ollama'
 
