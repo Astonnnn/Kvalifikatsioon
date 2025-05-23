@@ -1,5 +1,6 @@
 import sqlite3
 
+#Loob andmebaasi juhul, kui seda juba olemas pole
 def loo_andmebaas():
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor() #aitab andmebaasist asju võtta
@@ -18,6 +19,7 @@ def loo_andmebaas():
     connection.commit()
     connection.close()
 
+#Muudab andmebaasis oleva veebilehe staatuse (blokeeritud/blokeerimata)
 def muuda_staatus(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
@@ -27,6 +29,7 @@ def muuda_staatus(veebileht):
     connection.commit()
     connection.close()
 
+#Lisab andmebaasi rea
 def lisa_veebileht_ja_aeg(veebileht, aeg):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
@@ -46,6 +49,7 @@ def lisa_veebileht_ja_aeg(veebileht, aeg):
     connection.close() #sulgeb ühenduse, et see jooksma ei jääks
 
 
+#Võtab veebilehe järjeljäänud ajast 5 sekundit alla
 def muuda_aeg(veebileht):
     try:
         connection = sqlite3.connect('andmed.db')
@@ -71,6 +75,8 @@ def muuda_aeg(veebileht):
             connection.close()
         return 0
 
+
+#Taastab algselt määratud aja
 def taasta_aeg(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
@@ -85,7 +91,7 @@ def taasta_aeg(veebileht):
         print('Ei ole olemas')
     connection.close()
 
-
+#Tagastab kõik andmebaasi andmed
 def kuva_veebilehed():
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
@@ -97,6 +103,7 @@ def kuva_veebilehed():
     connection.close()
     return andmed
 
+#kustutab andmebaasi rea, mille veebilehe tulbas on argument
 def kustuta_veebileht(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()
@@ -104,6 +111,7 @@ def kustuta_veebileht(veebileht):
     connection.commit()
     connection.close()
 
+#muudab staatust tulbal, mis märgib, kas hetkel on küsimus ees või mitte
 def muuda_küsimise_kuvamise_staatus(veebileht):
     connection = sqlite3.connect('andmed.db')
     cursor = connection.cursor()

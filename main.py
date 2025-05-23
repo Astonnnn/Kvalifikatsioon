@@ -8,12 +8,14 @@ from andmebaas import muuda_staatus, taasta_aeg, muuda_küsimise_kuvamise_staatu
 
 
 def main():
+    #peaaken
     app = QApplication(sys.argv)
     window = MainWindow()
     window.resize(300, 300)
 
     api_server.set_main_window(window)
 
+    #kuvab küsimuse ning vastavalt vastusele käitub edasi
     def handle_dialog(veebileht):
         muuda_küsimise_kuvamise_staatus(veebileht)
         tulemus = run_app(window)

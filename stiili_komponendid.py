@@ -1,4 +1,4 @@
-#Disain
+#Disain, töötab samamoodi nagu tavaline css || dokum. -> https://doc.qt.io/qtforpython-6/tutorials/basictutorial/widgetstyling.html
 
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QLabel, QMainWindow
 from PyQt5.QtGui import QFont, QIntValidator

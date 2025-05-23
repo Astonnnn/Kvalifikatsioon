@@ -15,18 +15,19 @@ class QuestionDialog(QDialog):
 
         self.käivita_kasutajaliides()
 
+
     def käivita_kasutajaliides(self):
         paigutus = QVBoxLayout()
 
         try:
             vastus = genereeri_valikvastustega_küsimus("science").split(";")
             if len(vastus) < 6:
-                raise ValueError("Invalid question format")
+                raise ValueError("Vale küsimuse formaat") #Juhuks, kui tehisintellekt koostab küsimuse vales formaadis
 
             küsimus, valik1, valik2, valik3, valik4 = vastus[:5]
             self.oigeVastus = vastus[5].strip()
 
-            # Fix correct answer formatting
+            # Leiab üige vastusevariandi
             for i in self.oigeVastus[::-1]:
                 if i.isupper() and i in ['A', 'B', 'C', 'D']:
                     self.oigeVastus = i
@@ -54,6 +55,7 @@ class QuestionDialog(QDialog):
 
         self.setLayout(paigutus)
 
+    #kontrollib, kas küsimus on õigesti vastatud ning tagastab tõeväärtuse
     def kontrolli_vastust(self):
         if not hasattr(self, 'button_group'):
             self.reject()
@@ -80,6 +82,7 @@ class QuestionDialog(QDialog):
 def run_app(parent=None):
     try:
         dialog = QuestionDialog(parent)
+        dialog.show()
         dialog.exec_()
         return dialog.result
     except Exception as e:

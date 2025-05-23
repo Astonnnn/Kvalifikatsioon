@@ -6,6 +6,7 @@ import re
 import sys
 
 
+#Genereerib valikvastustega küsimuse (Inglise keeles), kasutab Ollamat ning Mistrali masinõppeprogrammi
 def genereeri_valikvastustega_küsimus(teema):
     prompt = f"""Generate a multiple choice question about: {teema}.
 Requirements:
@@ -15,7 +16,7 @@ Requirements:
 -output follows this format: Q: Question; A) Answer1; B) Answer2; C) Answer3; D) Answer4; Correct Answer: (A/B/C/D)
 """
     if platform.system() == 'Windows':
-        ollama_path = r'C:\Users\aston\AppData\Local\Programs\Ollama\ollama.exe'
+        ollama_path = r'ollama.exe'
     else:
         ollama_path = 'ollama'
 

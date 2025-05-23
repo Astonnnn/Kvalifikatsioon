@@ -33,9 +33,10 @@ class MainWindow(QMainWindow):
         self.tab_vidin.setCurrentWidget(self.tab_esileht)
 
 
-        self.create_menu_bar()
+        self.loo_menyy()
 
 
+    #Funktsioon määrab esilehe paigutuse ja sisu
     def esileht(self):
         self.tab_esileht = QWidget()
 
@@ -111,7 +112,7 @@ class MainWindow(QMainWindow):
         self.tab_esileht.setLayout(peamine_paigutus)
         self.tab_vidin.addTab(self.tab_esileht, "➕ Esileht")
 
-
+    # Funktsioon määrab veebilehti sisaldava lehe paigutuse ja sisu
     def veebilehed(self):
 
         self.tab_veebilehed = QWidget()
@@ -187,7 +188,7 @@ class MainWindow(QMainWindow):
 
 
 
-    def create_menu_bar(self):
+    def loo_menyy(self):
         #LOOME MENÜÜ
         menüü_loend = self.menuBar() #loob menüübari, sinna saab lisada veel dropdowne
         menüü_loend.setStyleSheet(menüü_bari_kujundus())
@@ -239,6 +240,7 @@ class MainWindow(QMainWindow):
     def sulge_rakendus(self):
         self.close()
 
+    #edastab andmed andmebaas.py failile
     def salvesta_veebileht(self):
         veebileht = self.url_sisestusväli.text().strip()
         aja_limiit = self.aja_sisestusväli.text().strip()
