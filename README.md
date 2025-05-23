@@ -1,52 +1,74 @@
-**Alla peab laetud olema git
+# Ülevaade
+Rakendus, mis aitab kasutajatel hallata veebilehtedel veedetud aega. Rakendus jälgib aktiivset lehitsemisaega, blokeerib (suunab ümber) häirivad saidid pärast ajapiiri täitumist ja esitab kasutajatele küsimusi saidile juurdepääsu taastamiseks. Ehitatud Pythoniga (PyQt5 GUI jaoks, Flask API jaoks) ja SQLite andmebaasiga.
 
-1. Loo endale kaust
+## Tehniline külg
+* Backend: Python, Flask, SQLite
 
-2. Ava cmd ning kirjuta: cd sinuKaust
+* Frontend: PyQt5
 
-3. kirjuta: git clone https://github.com/Astonnnn/Kvalifikatsioon
+* Brauseri integratsioon: Chrome'i laiend ja BingAPI
 
-4. Loo ja Aktiveeri virtuaalne keskkond 
+* AI: Ollama koos Mistral mudeliga küsimuste genereerimiseks, töötab lokaalselt
 
-   4.1 python -m venv env
+## Paigaldusjuhised
+### Eeltingimused
+* Python 3.8+
 
-   4.2 env\Scripts\activate
+* Git
 
-    Asi on õnnestunud, kui cmd's on su kausta nime ees (env)    
+* Ollama paigaldatud ja töökorras (küsimuste genereerimiseks)
 
-3. Lae alla moodulid
+* Mistral masinõppeprogramm
 
-    3.1 pip install -r requirements.txt
-    
-    Asi on õnnestunud, kui sinu kausta, kui sa vaatad kas file explorerist
-    või mujalt kaustas env, selle alamkaustas Scripts mitmed erinevad .exe failid
+## Paigaldamine
+### Kausta kloonimine enda arvutisse:
 
-4. Ühenda enda kaust gihubiga, kui pole juba
+```
+git clone https://github.com/Astonnnn/Kvalifikatsioon
+cd Kvalifikatsioon
+```
+### Loo ja aktiveeri virtuaalne keskkond (samas terminalis):
+```
+python -m venv env
 
-    git remote remove origin
+env\Scripts\activate #Windows
+source env/bin/activate #Mac/Linux
+```
+### Paigalda sõltuvused/moodulid (terminalis pead olema kloonitud kaustas ning virtuaalne keskkond aktiveeritud nt. (env) PS C:\Users\aston\Documents\kval>):
+```
+pip install -r requirements.txt
+```
 
-    git remote add origin "https://github.com/Astonnnn/Kvalifikatsioon"
-    
+## Seadista Chrome'i laiendus:
 
+* Ava <chrome://extensions/>  
 
-ÜLES LAADIMINE
+* Lülita sisse "Arendaja režiim"/"Developer mode"
 
-1. git status (kontrollime, millised failid muutusid)
-2. git add . (lisame kõik muutused valikusse)
-3. git commit -m "Kirjeldus" (Commitime koos kommetaariga)
-4. git push origin main
+* Klõpsa "Laadi lahtipakitud"/"Load unpacked" ja vali chrome_extension kaust (tervikuna) (ENNE RAKENDUSE KÄIVITAMIST VÕIB CHROME EXTENSIONI SISSE-VÄLJA LÜLITADA, SEE LAKKAB TÖÖTAMAST, KUI SERVER POLE PIKALT TÖÖTANUD)
 
+## Ollama paigaldamine
 
-#Serveri ja chrome extensioni tööle saamine
+* Mine lehele <https://ollama.com/download> ning lae Ollama alla
+* Ava cmd ning sisesta:
+```ollama run mistral```
+*Laadimise lõppemisel võid cmd sulgeda
 
-1. Mine lehele "chrome://extensions/"
-2. Paremalt ülevalt sisse kindlasti Developer mode
-3. Siis nupule "Load unpacked"
-4. Sealt valid kausta "chrome_extension"
+## Käivita rakendus:
 
-Chromeis peaks nüüd olemas olema see laiend
+```
+python main.py #või jooksuta lihtsalt otse failist
+```
 
-Et tööle saada:
+## Kasutusjuhend
+* Lisa veebileht koos ajalimiidiga andmebaasi
 
-1. Käivita Flaski serveri fail "api_server.py"
-2. Laiend hakkab sinna iga 5 sekundi tagant saatma receive_tabs() funktsiooni saatma avatud veebilehtede url-le
+* Chrome'i laiend saadab sinu aktiivse veebilehe URL rakendusele ning rakendus võtab aega maha, kui see sinu andmebaasis
+
+### Kui aeg täitub:
+
+* Sait blokeeritakse
+
+* Vasta genereeritud küsimusele blokeeringu eemaldamiseks
+
+* Kõik veebilehti saab näha ja hallata veebilehtede lehelt
