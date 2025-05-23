@@ -52,7 +52,7 @@ pip install -r requirements.txt
 * Mine lehele <https://ollama.com/download> ning lae Ollama alla
 * Ava cmd ning sisesta:
 ```ollama run mistral```
-*Laadimise lõppemisel võid cmd sulgeda
+*Laadimise lõppemisel võid cmd sulgeda || vahepeal võib juhtuda, et on vaja küsimuse_genereerija failis panna ollama.exe asemel absoluutne failitee 
 
 ## Käivita rakendus:
 
